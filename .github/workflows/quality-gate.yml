@@ -1,0 +1,47 @@
+name: Quality Gate
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # Próximas evoluções (descomente conforme adicionar):
+      #
+      # - name: Tests
+      #   run: npm run test -- --coverage
+      #
+      # - name: Code duplication
+      #   run: npx jscpd src --threshold 5
+      #
+      # - name: Lighthouse CI
+      #   run: |
+      #     npm install -g @lhci/cli
+      #     lhci autorun
+      #
+      # - name: Quality ratchet
+      #   run: node scripts/quality-ratchet.js
