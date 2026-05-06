@@ -155,7 +155,7 @@ Pare o loop quando **qualquer um** for verdadeiro:
 - **Nunca** force push (`git push -f`) em branch protegida (incluindo `main`).
 - **Nunca** mexa em segredos, tokens, variáveis de ambiente.
 - **Nunca** altere `package-lock.json` à mão. Se o lock precisar mudar, rode `npm install` e commite o resultado.
-- **Nunca** "consert e" o PR alterando o `baseline.json` (se existir) para fazer a catraca passar. A catraca só anda pra frente.
+- **Nunca** "conserte" o PR alterando o `baseline.json` (se existir) para fazer a catraca passar. A catraca só anda pra frente.
 - **Nunca** delete testes para fazer o CI passar. Se um teste falha legitimamente, o código está errado, não o teste.
 - Se em dúvida sobre a intenção do reviewer, **deixe um comentário pedindo clarificação** em vez de adivinhar.
 
