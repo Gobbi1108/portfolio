@@ -1,0 +1,69 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Portfolio",
+  description = "Neubrutalist portfolio.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-brutal-paper text-brutal-ink font-sans antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:btn-brutal"
+    >
+      Pular para conteúdo
+    </a>
+
+    <header
+      class="border-brutal border-b-4 bg-brutal-paper sticky top-0 z-40"
+    >
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <a
+          href="/"
+          class="font-display text-2xl uppercase tracking-tight"
+          aria-label="Início"
+        >
+          Portfolio<span class="text-brutal-pink">.</span>
+        </a>
+        <nav aria-label="Principal" class="flex items-center gap-2">
+          <a href="/" class="px-3 py-2 font-display text-sm uppercase">Home</a>
+          <a href="/styleguide" class="px-3 py-2 font-display text-sm uppercase"
+            >Styleguide</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="mx-auto max-w-6xl px-6 py-12">
+      <slot />
+    </main>
+
+    <footer
+      class="border-brutal border-t-4 bg-brutal-black text-brutal-paper mt-24"
+    >
+      <div
+        class="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <p class="font-display uppercase tracking-wider">
+          &copy; {new Date().getFullYear()} Portfolio
+        </p>
+        <p class="text-sm opacity-70">Construído com Astro + Tailwind v4.</p>
+      </div>
+    </footer>
+  </body>
+</html>

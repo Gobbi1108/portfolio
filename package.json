@@ -16,6 +16,8 @@
   "dependencies": {
     "@astrojs/check": "^0.9.9",
     "@astrojs/react": "^5.0.4",
+    "@fontsource/archivo-black": "^5.2.8",
+    "@fontsource/inter": "^5.2.8",
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",

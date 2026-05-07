@@ -1,17 +1,35 @@
 ---
-
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="Portfolio — em construção"
+  description="Layout base e tokens neubrutalistas. Conteúdo real em breve."
+>
+  <section class="py-12">
+    <p class="font-display text-sm uppercase tracking-widest text-brutal-pink">
+      WIP
+    </p>
+    <h1 class="mt-2">Layout base pronto.</h1>
+    <p class="mt-4 max-w-2xl text-lg">
+      Tokens, tipografia e componentes definidos. Sem conteúdo real ainda — veja{
+        " "
+      }
+      <a
+        href="/styleguide"
+        class="border-brutal-thick inline-block bg-brutal-yellow px-2 font-display uppercase"
+        >/styleguide</a
+      > para validar o sistema.
+    </p>
+
+    <div class="mt-8 flex flex-wrap gap-4">
+      <a
+        href="/styleguide"
+        class="btn-brutal btn-brutal-hover"
+        role="button"
+      >
+        Abrir Styleguide
+      </a>
+    </div>
+  </section>
+</BaseLayout>
