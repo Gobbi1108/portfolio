@@ -1,0 +1,178 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const colors: { name: string; cls: string; hex: string; onDark?: boolean }[] = [
+  { name: "black", cls: "bg-brutal-black", hex: "#0a0a0a", onDark: true },
+  { name: "ink", cls: "bg-brutal-ink", hex: "#1a1a1a", onDark: true },
+  { name: "paper", cls: "bg-brutal-paper", hex: "#faf7f0" },
+  { name: "bone", cls: "bg-brutal-bone", hex: "#ece6d6" },
+  { name: "yellow", cls: "bg-brutal-yellow", hex: "#ffd400" },
+  { name: "pink", cls: "bg-brutal-pink", hex: "#ff4fa8" },
+  { name: "blue", cls: "bg-brutal-blue", hex: "#2b6cff", onDark: true },
+  { name: "lime", cls: "bg-brutal-lime", hex: "#b6ff3a" },
+];
+
+const shadows = [
+  { name: "shadow-brutal-sm", cls: "shadow-brutal-sm" },
+  { name: "shadow-brutal-md", cls: "shadow-brutal-md" },
+  { name: "shadow-brutal-lg", cls: "shadow-brutal-lg" },
+  { name: "shadow-brutal-xl", cls: "shadow-brutal-xl" },
+];
+---
+
+<BaseLayout title="Styleguide — Portfolio" description="Tokens neubrutalistas.">
+  <header class="mb-12">
+    <p class="font-display text-sm uppercase tracking-widest text-brutal-pink">
+      Design System
+    </p>
+    <h1 class="mt-2">Styleguide</h1>
+    <p class="mt-4 max-w-2xl text-lg">
+      Tokens base do portfolio: cores chapadas, sombras hard, bordas grossas e
+      tipografia forte. Validação visual antes do conteúdo real.
+    </p>
+  </header>
+
+  <section aria-labelledby="colors" class="mb-16">
+    <h2 id="colors" class="mb-6">Cores</h2>
+    <div class="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+      {
+        colors.map((c) => (
+          <div class="border-brutal shadow-brutal-md">
+            <div class={`${c.cls} h-28`} />
+            <div class="border-brutal border-t-2 bg-brutal-paper px-3 py-2">
+              <p class="font-display uppercase">{c.name}</p>
+              <p class="font-mono text-xs">{c.hex}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="typography" class="mb-16">
+    <h2 id="typography" class="mb-6">Tipografia</h2>
+    <div class="card-brutal space-y-4">
+      <div>
+        <p class="font-mono text-xs uppercase opacity-60">H1 — display</p>
+        <h1>Heading nível 1</h1>
+      </div>
+      <div>
+        <p class="font-mono text-xs uppercase opacity-60">H2 — display</p>
+        <h2>Heading nível 2</h2>
+      </div>
+      <div>
+        <p class="font-mono text-xs uppercase opacity-60">H3 — display</p>
+        <h3>Heading nível 3</h3>
+      </div>
+      <div>
+        <p class="font-mono text-xs uppercase opacity-60">H4 — display</p>
+        <h4>Heading nível 4</h4>
+      </div>
+      <div>
+        <p class="font-mono text-xs uppercase opacity-60">H5 — display</p>
+        <h5>Heading nível 5</h5>
+      </div>
+      <div>
+        <p class="font-mono text-xs uppercase opacity-60">H6 — display</p>
+        <h6>Heading nível 6</h6>
+      </div>
+      <div class="border-brutal border-t-2 pt-4">
+        <p class="font-mono text-xs uppercase opacity-60">Body — sans</p>
+        <p class="text-base">
+          O quick brown fox jumps over the lazy dog. 0123456789. Texto base do
+          portfolio em Inter, 16px, leitura confortável em qualquer tamanho.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="buttons" class="mb-16">
+    <h2 id="buttons" class="mb-6">Botões</h2>
+    <div class="flex flex-wrap gap-6">
+      <button type="button" class="btn-brutal btn-brutal-hover">
+        Primário
+      </button>
+      <button
+        type="button"
+        class="btn-brutal btn-brutal-hover bg-brutal-pink text-brutal-paper"
+      >
+        Secundário
+      </button>
+      <button
+        type="button"
+        class="btn-brutal btn-brutal-hover bg-brutal-blue text-brutal-paper"
+      >
+        Terciário
+      </button>
+      <button
+        type="button"
+        class="btn-brutal btn-brutal-hover bg-brutal-paper"
+      >
+        Ghost
+      </button>
+      <button
+        type="button"
+        class="btn-brutal btn-brutal-hover bg-brutal-black text-brutal-paper"
+      >
+        Dark
+      </button>
+    </div>
+  </section>
+
+  <section aria-labelledby="cards" class="mb-16">
+    <h2 id="cards" class="mb-6">Cards</h2>
+    <div class="grid gap-6 md:grid-cols-3">
+      <article class="card-brutal">
+        <h3 class="mb-2">Card padrão</h3>
+        <p>Fundo paper, borda preta grossa e sombra hard.</p>
+      </article>
+      <article class="card-brutal bg-brutal-yellow">
+        <h3 class="mb-2">Card destaque</h3>
+        <p>Mesma estrutura, fundo amarelo chapado.</p>
+      </article>
+      <article class="card-brutal bg-brutal-black text-brutal-paper">
+        <h3 class="mb-2">Card invertido</h3>
+        <p>Versão escura para hierarquia.</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="shadows" class="mb-16">
+    <h2 id="shadows" class="mb-6">Sombras</h2>
+    <div class="grid grid-cols-2 gap-8 sm:grid-cols-4">
+      {
+        shadows.map((s) => (
+          <div class="text-center">
+            <div
+              class={`border-brutal bg-brutal-paper h-24 w-full ${s.cls}`}
+            />
+            <p class="mt-3 font-mono text-xs">{s.name}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="borders" class="mb-16">
+    <h2 id="borders" class="mb-6">Bordas</h2>
+    <div class="grid grid-cols-2 gap-6 sm:grid-cols-3">
+      <div class="border-brutal bg-brutal-paper p-6">
+        <p class="font-mono text-xs uppercase opacity-60">border-brutal</p>
+        <p>2px sólida preta</p>
+      </div>
+      <div class="border-brutal-thick bg-brutal-paper p-6">
+        <p class="font-mono text-xs uppercase opacity-60">
+          border-brutal-thick
+        </p>
+        <p>4px sólida preta</p>
+      </div>
+      <div
+        class="border-brutal bg-brutal-lime p-6"
+        style="border-color: var(--color-brutal-pink);"
+      >
+        <p class="font-mono text-xs uppercase opacity-60">borda customizada</p>
+        <p>2px sólida pink</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

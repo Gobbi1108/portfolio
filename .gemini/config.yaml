@@ -1,0 +1,27 @@
+# Configuração do Gemini Code Assist for GitHub
+# Documentação: https://developers.google.com/gemini-code-assist/docs/customize-gemini-behavior-github
+
+have_fun: false
+
+code_review:
+  # Habilita revisão de código
+  disable: false
+
+  # Severidade mínima dos comentários: CRITICAL, HIGH, MEDIUM, LOW
+  # MEDIUM = equilibrado. Se sentir muito ruído, sobe pra HIGH.
+  # Se quiser revisão mais minuciosa (inclui estilo), desce pra LOW.
+  comment_severity_threshold: 'MEDIUM'
+
+  # -1 = sem limite de comentários por PR
+  max_review_comments: -1
+
+  # Comportamento ao abrir um PR novo
+  pull_request_opened:
+    # Não posta o "help" automático em PRs novos (polui)
+    help: false
+    # Posta um sumário das mudanças em linguagem natural
+    summary: true
+    # Faz a revisão de código completa automaticamente
+    code_review: true
+    # Não revisa drafts (rascunhos) — economiza quota e ruído
+    include_drafts: false
