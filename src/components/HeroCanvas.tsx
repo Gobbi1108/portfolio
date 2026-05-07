@@ -1,7 +1,13 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Outlines } from "@react-three/drei";
-import { useEffect, useMemo, useRef, useState } from "react";
-import * as THREE from "three";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import {
+  DataTexture,
+  IcosahedronGeometry,
+  Mesh,
+  NearestFilter,
+  RedFormat,
+} from "three";
 
 const BRUTAL_PINK = "#ff4fa8";
 const BRUTAL_BLACK = "#0a0a0a";
@@ -23,21 +29,25 @@ function buildToonGradient(steps: number) {
   for (let i = 0; i < steps; i++) {
     data[i] = Math.round(((i + 1) / steps) * 255);
   }
-  const tex = new THREE.DataTexture(data, steps, 1, THREE.RedFormat);
-  tex.minFilter = THREE.NearestFilter;
-  tex.magFilter = THREE.NearestFilter;
+  const tex = new DataTexture(data, steps, 1, RedFormat);
+  tex.minFilter = NearestFilter;
+  tex.magFilter = NearestFilter;
   tex.generateMipmaps = false;
   tex.needsUpdate = true;
   return tex;
 }
 
 function ToonIcosa({ paused }: { paused: boolean }) {
-  const ref = useRef<THREE.Mesh>(null);
+  const ref = useRef<Mesh>(null);
+  const geometry = useMemo(() => new IcosahedronGeometry(1, 0), []);
   const gradientMap = useMemo(() => buildToonGradient(3), []);
 
   useEffect(() => {
-    return () => gradientMap.dispose();
-  }, [gradientMap]);
+    return () => {
+      geometry.dispose();
+      gradientMap.dispose();
+    };
+  }, [geometry, gradientMap]);
 
   useFrame((_, delta) => {
     if (paused || !ref.current) return;
@@ -46,8 +56,7 @@ function ToonIcosa({ paused }: { paused: boolean }) {
   });
 
   return (
-    <mesh ref={ref} rotation={[0.4, 0.6, 0]}>
-      <icosahedronGeometry args={[1, 0]} />
+    <mesh ref={ref} rotation={[0.4, 0.6, 0]} geometry={geometry}>
       <meshToonMaterial color={BRUTAL_PINK} gradientMap={gradientMap} />
       <Outlines
         thickness={6}
@@ -69,9 +78,11 @@ export default function HeroCanvas() {
       gl={{ antialias: true, alpha: true }}
       style={{ width: "100%", height: "100%" }}
     >
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[3, 4, 5]} intensity={1.4} />
-      <ToonIcosa paused={reduced} />
+      <Suspense fallback={null}>
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[3, 4, 5]} intensity={1.4} />
+        <ToonIcosa paused={reduced} />
+      </Suspense>
     </Canvas>
   );
 }
