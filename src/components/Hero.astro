@@ -33,7 +33,7 @@ const {
         <Image
           src={avatar}
           alt={`Foto de ${name}`}
-          widths={[320, 480, 640]}
+          widths={[320, 480, 640, 800, 960]}
           sizes="(min-width: 768px) 22rem, 90vw"
           class="block aspect-square w-full object-cover"
           loading="eager"
@@ -59,13 +59,13 @@ const {
         {role}
       </p>
       <p class="max-w-xl text-lg">{bio}</p>
-    </div>
-  </div>
 
-  <div class="mt-10 flex md:mt-14">
-    <a href={ctaHref} class="btn-brutal btn-brutal-hover">
-      {ctaLabel}
-      <span aria-hidden="true">→</span>
-    </a>
+      <div class="mt-5 flex md:mt-8">
+        <a href={ctaHref} class="btn-brutal btn-brutal-hover">
+          {ctaLabel}
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
   </div>
 </section>
