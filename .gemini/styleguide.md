@@ -70,18 +70,15 @@ A estética é **chapada, intencional, sem sutilezas**. Toda a UI deve refletir 
 
 ## 6. Convenções Tailwind
 
+Projeto usa **Tailwind v4 CSS-first**. Sem `tailwind.config.{js,mjs,ts}` — toda configuração vive em `src/styles/global.css` via `@theme`, `@layer` e `@utility`. Plugin Vite (`@tailwindcss/vite`) faz o build.
+
 - Use o sistema de classes utilitárias. **Não** crie CSS customizado em `<style>` exceto para keyframes específicos.
-- Cores customizadas devem ser definidas em `tailwind.config.mjs` sob `theme.extend.colors`.
-- Sombras brutalistas devem ser tokens do tema:
-  ```js
-  boxShadow: {
-    'brutal': '8px 8px 0 0 #000',
-    'brutal-sm': '4px 4px 0 0 #000',
-    'brutal-lg': '12px 12px 0 0 #000',
-  }
-  ```
+- Tokens (cores, fontes, sombras, radius) ficam em `@theme { ... }` em `src/styles/global.css` como CSS variables com prefixo namespaced (`--color-*`, `--font-*`, `--shadow-*`, `--radius-*`). Tailwind gera as utilitárias correspondentes (ex.: `--color-brutal-yellow` → `bg-brutal-yellow`, `text-brutal-yellow`, `border-brutal-yellow`).
+- Sombras brutalistas devem ser tokens do tema (já existem `--shadow-brutal-sm|md|lg|xl`). Use `shadow-brutal-md` etc., não `shadow-[Npx_Npx_0_0_#000]` arbitrário, salvo exceção justificada.
+- Componentes recorrentes (botões, cards, bordas brutalistas) ficam em `@utility` no `global.css` (ex.: `btn-brutal`, `card-brutal`, `border-brutal`). Não duplique esse CSS inline.
 - Use `cn()` (clsx + tailwind-merge) para composição condicional de classes.
 - **Proibido** `!important` (`!`) exceto em overrides justificados com comentário.
+- **Não** reintroduza `tailwind.config.*`. Se precisar de algo que `@theme` não cobre, abra discussão antes.
 
 ---
 
