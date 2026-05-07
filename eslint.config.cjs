@@ -5,6 +5,7 @@ const tsPlugin = require('@typescript-eslint/eslint-plugin');
 const astro = require('eslint-plugin-astro');
 const jsxA11y = require('eslint-plugin-jsx-a11y');
 const astroParser = require('astro-eslint-parser');
+const globals = require('globals');
 
 module.exports = [
   {
@@ -27,6 +28,10 @@ module.exports = [
       parser: tsParser,
       ecmaVersion: 'latest',
       sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.es2021,
+      },
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
