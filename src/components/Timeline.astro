@@ -1,0 +1,155 @@
+---
+// Timeline — estrutura base (PR #4 do roteiro)
+//
+// 4 cenas verticais (baby → child → scout → tech), cada uma full-bleed com
+// cor distinta da paleta brutalista e um placeholder retangular `[cenário]`.
+// Uma "janela do personagem" fica sticky ao centro da viewport e atravessa
+// todas as cenas — é o slot onde o Lottie entra no próximo PR.
+//
+// Roadmap (PRs futuros):
+//   PR #5: substituir `.character-window` por Lottie player (toon do hero
+//          reaparece e se transforma a cada cena). Player respeita
+//          prefers-reduced-motion: pausado em frame neutro.
+//   PR #6: cenário interno de cada `.scene` (ilustração / props / props
+//          flutuando). Mantém o placeholder como fallback.
+//   PR #7: scroll-driven animation — sincronizar progresso da cena com
+//          frame do Lottie (IntersectionObserver + scrollYProgress, ou
+//          CSS scroll-timeline onde suportado). Sem scrub: idle/loop curto.
+//   PR #8: textos finais de cada fase (copy + microinterações).
+//
+// Por ora: scroll vertical normal, sem JS, sem scrub. Estrutura semântica
+// e contraste AA já corretos para Lighthouse.
+
+interface Scene {
+  id: string;
+  index: string;
+  title: string;
+  kicker: string;
+  bg: string; // classe tailwind do fundo
+  fg: string; // classe tailwind do texto
+  placeholderBg: string;
+}
+
+const scenes: Scene[] = [
+  {
+    id: "scene-baby",
+    index: "01",
+    title: "Bebê",
+    kicker: "Primeiros traços",
+    bg: "bg-brutal-paper",
+    fg: "text-brutal-ink",
+    placeholderBg: "bg-brutal-bone",
+  },
+  {
+    id: "scene-child",
+    index: "02",
+    title: "Criança",
+    kicker: "Curiosidade solta",
+    bg: "bg-brutal-yellow",
+    fg: "text-brutal-ink",
+    placeholderBg: "bg-brutal-paper",
+  },
+  {
+    id: "scene-scout",
+    index: "03",
+    title: "Escoteiro",
+    kicker: "Mundo lá fora",
+    bg: "bg-brutal-lime",
+    fg: "text-brutal-ink",
+    placeholderBg: "bg-brutal-paper",
+  },
+  {
+    id: "scene-tech",
+    index: "04",
+    title: "Tech",
+    kicker: "Onde estou agora",
+    bg: "bg-brutal-blue",
+    fg: "text-brutal-paper",
+    placeholderBg: "bg-brutal-black",
+  },
+];
+---
+
+<section
+  id="timeline"
+  aria-label="Linha do tempo"
+  class="timeline relative"
+>
+  <!--
+    Stage sticky com a janela do personagem. Fica colado no topo da
+    viewport e atravessa todas as cenas. Pointer-events none para não
+    bloquear cliques nas cenas abaixo.
+  -->
+  <div
+    class="character-stage pointer-events-none sticky top-0 z-20 flex h-dvh items-center justify-center"
+    aria-hidden="true"
+  >
+    <div
+      data-character-slot
+      class="character-window border-brutal-thick bg-brutal-paper shadow-brutal-xl flex aspect-square w-40 items-center justify-center sm:w-48 md:w-56 lg:w-64"
+    >
+      <span
+        class="font-display text-xs uppercase tracking-widest text-brutal-ink opacity-70 sm:text-sm"
+      >
+        [personagem aqui]
+      </span>
+    </div>
+  </div>
+
+  <!--
+    Cenas empilhadas. Margem negativa de 100dvh puxa a primeira cena para
+    cima da stage sticky, criando o efeito de "personagem sobre cenário".
+    dvh (dynamic viewport height) mantém alinhamento no mobile quando a
+    barra de endereço colapsa/expande.
+  -->
+  <div class="scenes scenes-bleed relative z-10">
+    {
+      scenes.map((scene) => (
+        <article
+          id={scene.id}
+          data-scene={scene.id}
+          class={`scene relative flex min-h-dvh w-full flex-col items-center justify-center px-6 py-24 ${scene.bg} ${scene.fg}`}
+          aria-labelledby={`${scene.id}-title`}
+        >
+          <header class="mb-10 flex flex-col items-center gap-2 text-center">
+            <p class="font-display text-sm uppercase tracking-[0.3em] opacity-70">
+              {scene.index} — {scene.kicker}
+            </p>
+            <h2
+              id={`${scene.id}-title`}
+              class="font-display text-6xl uppercase leading-none sm:text-7xl md:text-8xl"
+            >
+              {scene.title}
+            </h2>
+          </header>
+
+          <div
+            data-scene-slot
+            class={`border-brutal-thick flex aspect-[4/3] w-full max-w-2xl items-center justify-center ${scene.placeholderBg} ${scene.fg} shadow-brutal-lg`}
+            role="img"
+            aria-label={`Placeholder do cenário ${scene.title}`}
+          >
+            <span class="font-display text-lg uppercase tracking-widest opacity-80">
+              [cenário]
+            </span>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  /* Full-bleed: escapa do container max-w-6xl do BaseLayout. O bloqueio
+     de scroll horizontal global vive em `global.css` (`html { overflow-x: clip }`),
+     que evita barra horizontal no desktop por causa do scrollbar reservado. */
+  .timeline {
+    margin-inline: calc(50% - 50vw);
+    width: 100vw;
+  }
+
+  /* Puxa as cenas sob a stage sticky. dvh para mobile não desalinhar. */
+  .scenes-bleed {
+    margin-top: -100dvh;
+  }
+</style>
