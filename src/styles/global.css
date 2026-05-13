@@ -36,6 +36,10 @@
     background-color: var(--color-brutal-paper);
     color: var(--color-brutal-ink);
     scroll-padding-top: 5rem;
+    /* Evita scrollbar horizontal quando seções full-bleed usam 100vw e o
+       scrollbar vertical do desktop reserva espaço. `clip` não cria novo
+       contexto de scroll (ao contrário de `hidden`), preservando sticky. */
+    overflow-x: clip;
   }
 
   body {

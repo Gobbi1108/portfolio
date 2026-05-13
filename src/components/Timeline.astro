@@ -81,7 +81,7 @@ const scenes: Scene[] = [
     bloquear cliques nas cenas abaixo.
   -->
   <div
-    class="character-stage pointer-events-none sticky top-0 z-20 flex h-screen items-center justify-center"
+    class="character-stage pointer-events-none sticky top-0 z-20 flex h-dvh items-center justify-center"
     aria-hidden="true"
   >
     <div
@@ -97,16 +97,18 @@ const scenes: Scene[] = [
   </div>
 
   <!--
-    Cenas empilhadas. Margem negativa de 100vh puxa a primeira cena para
+    Cenas empilhadas. Margem negativa de 100dvh puxa a primeira cena para
     cima da stage sticky, criando o efeito de "personagem sobre cenário".
+    dvh (dynamic viewport height) mantém alinhamento no mobile quando a
+    barra de endereço colapsa/expande.
   -->
-  <div class="scenes -mt-screen relative z-10">
+  <div class="scenes scenes-bleed relative z-10">
     {
       scenes.map((scene) => (
         <article
           id={scene.id}
           data-scene={scene.id}
-          class={`scene relative flex min-h-screen w-full flex-col items-center justify-center px-6 py-24 ${scene.bg} ${scene.fg}`}
+          class={`scene relative flex min-h-dvh w-full flex-col items-center justify-center px-6 py-24 ${scene.bg} ${scene.fg}`}
           aria-labelledby={`${scene.id}-title`}
         >
           <header class="mb-10 flex flex-col items-center gap-2 text-center">
@@ -123,7 +125,7 @@ const scenes: Scene[] = [
 
           <div
             data-scene-slot
-            class={`border-brutal-thick flex aspect-[4/3] w-full max-w-2xl items-center justify-center ${scene.placeholderBg} text-brutal-ink shadow-brutal-lg`}
+            class={`border-brutal-thick flex aspect-[4/3] w-full max-w-2xl items-center justify-center ${scene.placeholderBg} ${scene.fg} shadow-brutal-lg`}
             role="img"
             aria-label={`Placeholder do cenário ${scene.title}`}
           >
@@ -138,24 +140,16 @@ const scenes: Scene[] = [
 </section>
 
 <style>
-  /* Full-bleed: escapa do container max-w-6xl do BaseLayout sem causar
-     scroll horizontal. `overflow-x: clip` corta sombras/overflows laterais. */
+  /* Full-bleed: escapa do container max-w-6xl do BaseLayout. O bloqueio
+     de scroll horizontal global vive em `global.css` (`html { overflow-x: clip }`),
+     que evita barra horizontal no desktop por causa do scrollbar reservado. */
   .timeline {
     margin-inline: calc(50% - 50vw);
     width: 100vw;
-    overflow-x: clip;
   }
 
-  /* Margem negativa de 100vh para puxar cenas sob a stage sticky. */
-  .-mt-screen {
-    margin-top: -100vh;
-  }
-
-  /* Reduz movimento: nada para desabilitar agora (sem animação ainda),
-     mas deixa o hook pronto para PRs futuros. */
-  @media (prefers-reduced-motion: reduce) {
-    .character-stage {
-      /* placeholder — Lottie do PR #5 pausa aqui */
-    }
+  /* Puxa as cenas sob a stage sticky. dvh para mobile não desalinhar. */
+  .scenes-bleed {
+    margin-top: -100dvh;
   }
 </style>
