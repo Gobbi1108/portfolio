@@ -1,0 +1,54 @@
+---
+// Cena 02 — Criança. 3 props: giz de cera, bloco com letra "A", estrela.
+---
+
+<div class="scene-decor pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+  <svg
+    data-decor-item
+    class="decor-item absolute left-[7%] top-[16%] w-20 sm:w-24 md:w-28 lg:w-32"
+    viewBox="0 0 80 140"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect x="18" y="34" width="44" height="86" fill="#ff4fa8" stroke="#1a1a1a" stroke-width="5" />
+    <rect x="18" y="34" width="44" height="14" fill="#faf7f0" stroke="#1a1a1a" stroke-width="5" />
+    <polygon points="18,34 40,4 62,34" fill="#faf7f0" stroke="#1a1a1a" stroke-width="5" stroke-linejoin="round" />
+    <line x1="30" y1="60" x2="30" y2="110" stroke="#1a1a1a" stroke-width="3" />
+    <line x1="50" y1="60" x2="50" y2="110" stroke="#1a1a1a" stroke-width="3" />
+  </svg>
+
+  <svg
+    data-decor-item
+    class="decor-item absolute bottom-[14%] right-[8%] w-24 sm:w-28 md:w-32 lg:w-40"
+    viewBox="0 0 100 100"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect x="6" y="6" width="88" height="88" fill="#2b6cff" stroke="#1a1a1a" stroke-width="6" />
+    <text
+      x="50"
+      y="72"
+      text-anchor="middle"
+      font-family="Archivo Black, sans-serif"
+      font-size="68"
+      font-weight="900"
+      fill="#faf7f0"
+    >A</text>
+  </svg>
+
+  <svg
+    data-decor-item
+    class="decor-item absolute right-[18%] top-[14%] hidden w-14 md:block lg:w-20"
+    viewBox="0 0 60 60"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M30 4 L37 22 L56 22 L41 34 L46 54 L30 42 L14 54 L19 34 L4 22 L23 22 Z"
+      fill="#ff4fa8"
+      stroke="#1a1a1a"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+  </svg>
+</div>

@@ -1,28 +1,32 @@
 ---
 // Timeline — estrutura base (PR #4) + personagem Lottie (PR #5)
+// + transições visuais entre cenários (PR #7).
 //
 // 4 cenas verticais (baby → child → scout → tech), cada uma full-bleed com
-// cor distinta da paleta brutalista e um placeholder retangular `[cenário]`.
-// Uma "janela do personagem" fica sticky ao centro da viewport e atravessa
-// todas as cenas; dentro dela vive o player Lottie (TimelineCharacter), que
-// roda em loop e respeita prefers-reduced-motion.
+// cor distinta da paleta brutalista. Cada cena agora carrega 2–3 props SVG
+// inline coerentes com a fase (chocalho/berço, giz/bloco/estrela, flor-de-lis/
+// bússola/fogueira, laptop/{}/prompt). Entrada/saída animadas via GSAP
+// ScrollTrigger conforme a janela do personagem (sticky) atravessa a cena.
+// Sem libs novas — gsap já está nas deps.
 //
 // Roadmap:
 //   PR #6: scroll-driven — sincronizar progresso da cena com frame do Lottie.
 //          O player já expõe window.__timelineCharacter.goToAndStop para isso.
-//   PR #7: cenário interno de cada `.scene` (props flutuando, etc).
 //   PR #8: textos finais de cada fase.
 
 import TimelineCharacter from "./TimelineCharacter.tsx";
+import BabyDecor from "./scenery/BabyDecor.astro";
+import ChildDecor from "./scenery/ChildDecor.astro";
+import ScoutDecor from "./scenery/ScoutDecor.astro";
+import TechDecor from "./scenery/TechDecor.astro";
 
 interface Scene {
-  id: string;
+  id: "scene-baby" | "scene-child" | "scene-scout" | "scene-tech";
   index: string;
   title: string;
   kicker: string;
-  bg: string; // classe tailwind do fundo
-  fg: string; // classe tailwind do texto
-  placeholderBg: string;
+  bg: string;
+  fg: string;
 }
 
 const scenes: Scene[] = [
@@ -33,7 +37,6 @@ const scenes: Scene[] = [
     kicker: "Primeiros traços",
     bg: "bg-brutal-paper",
     fg: "text-brutal-ink",
-    placeholderBg: "bg-brutal-bone",
   },
   {
     id: "scene-child",
@@ -42,7 +45,6 @@ const scenes: Scene[] = [
     kicker: "Curiosidade solta",
     bg: "bg-brutal-yellow",
     fg: "text-brutal-ink",
-    placeholderBg: "bg-brutal-paper",
   },
   {
     id: "scene-scout",
@@ -51,7 +53,6 @@ const scenes: Scene[] = [
     kicker: "Mundo lá fora",
     bg: "bg-brutal-lime",
     fg: "text-brutal-ink",
-    placeholderBg: "bg-brutal-paper",
   },
   {
     id: "scene-tech",
@@ -60,7 +61,6 @@ const scenes: Scene[] = [
     kicker: "Onde estou agora",
     bg: "bg-brutal-blue",
     fg: "text-brutal-paper",
-    placeholderBg: "bg-brutal-black",
   },
 ];
 ---
@@ -99,10 +99,15 @@ const scenes: Scene[] = [
         <article
           id={scene.id}
           data-scene={scene.id}
-          class={`scene relative flex min-h-dvh w-full flex-col items-center justify-center px-6 py-24 ${scene.bg} ${scene.fg}`}
+          class={`scene relative flex min-h-dvh w-full flex-col items-center justify-center overflow-hidden px-6 py-24 ${scene.bg} ${scene.fg}`}
           aria-labelledby={`${scene.id}-title`}
         >
-          <header class="mb-10 flex flex-col items-center gap-2 text-center">
+          {scene.id === "scene-baby" && <BabyDecor />}
+          {scene.id === "scene-child" && <ChildDecor />}
+          {scene.id === "scene-scout" && <ScoutDecor />}
+          {scene.id === "scene-tech" && <TechDecor />}
+
+          <header class="relative z-10 flex flex-col items-center gap-2 text-center">
             <p class="font-display text-sm uppercase tracking-[0.3em] opacity-70">
               {scene.index} — {scene.kicker}
             </p>
@@ -113,17 +118,6 @@ const scenes: Scene[] = [
               {scene.title}
             </h2>
           </header>
-
-          <div
-            data-scene-slot
-            class={`border-brutal-thick flex aspect-[4/3] w-full max-w-2xl items-center justify-center ${scene.placeholderBg} ${scene.fg} shadow-brutal-lg`}
-            role="img"
-            aria-label={`Placeholder do cenário ${scene.title}`}
-          >
-            <span class="font-display text-lg uppercase tracking-widest opacity-80">
-              [cenário]
-            </span>
-          </div>
         </article>
       ))
     }
@@ -143,4 +137,66 @@ const scenes: Scene[] = [
   .scenes-bleed {
     margin-top: -100dvh;
   }
+
+  /* Estado inicial das props de cenário (PR #7). GSAP ScrollTrigger anima
+     opacity/transform na entrada/saída da cena. Limitamos `will-change` aos
+     itens visíveis para não inflar a memória de composição.
+
+     Reduced motion: fallback CSS revela tudo sem animação. O script abaixo
+     também bail-out via matchMedia. */
+  [data-decor-item] {
+    opacity: 0;
+    transform: translateY(40px) scale(0.9);
+    will-change: transform, opacity;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-decor-item] {
+      opacity: 1;
+      transform: none;
+      will-change: auto;
+    }
+  }
 </style>
+
+<script>
+  // PR #7 — anima props de cenário conforme o personagem (janela sticky)
+  // atravessa cada cena. Sem libs novas: GSAP/ScrollTrigger já estão nas deps.
+  // ScrollTrigger é importado dinamicamente para não bloquear o thread principal
+  // do bundle inicial do <head>; Astro coloca este <script> como `type=module`
+  // e executa após o DOM estar pronto.
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  if (!reduceMotion) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const scenes = document.querySelectorAll<HTMLElement>("[data-scene]");
+    scenes.forEach((scene) => {
+      const items = scene.querySelectorAll<HTMLElement>("[data-decor-item]");
+      if (items.length === 0) return;
+
+      // toggleActions: play / reverse / play / reverse cobre os 4 callbacks
+      // (onEnter, onLeave, onEnterBack, onLeaveBack) — entra ao chegar,
+      // sai ao deixar, em ambas direções de scroll.
+      gsap.to(items, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.6,
+        ease: "back.out(1.3)",
+        stagger: 0.08,
+        scrollTrigger: {
+          trigger: scene,
+          start: "top 75%",
+          end: "bottom 25%",
+          toggleActions: "play reverse play reverse",
+        },
+      });
+    });
+  }
+</script>
