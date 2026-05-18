@@ -12,7 +12,17 @@
   --color-brutal-bone: #ece6d6;
   --color-brutal-yellow: #ffd400;
   --color-brutal-pink: #ff4fa8;
-  --color-brutal-blue: #2b6cff;
+  /* Variante escura do rosa, exclusiva para texto. O pink #ff4fa8 contra
+     paper (#faf7f0) tem 2.82:1 — falha WCAG AA (4.5:1) para texto pequeno.
+     #b3155f vs paper = 6.16:1 e vs yellow = 4.60:1, passando AA nos dois
+     fundos onde o accent aparece (kickers de seções). Pink original
+     permanece para fundos chapados, SVGs decorativos e bordas. */
+  --color-brutal-magenta: #b3155f;
+  /* Azul mais profundo que o original (#2b6cff) — necessário para contraste
+     AA de texto paper (#faf7f0) sobre o fundo blue: passa de 4.18:1 para
+     6.26:1, atendendo WCAG AA (>=4.5:1). Permanece visivelmente "blue" e
+     mantém papel de cor de foco/destaque. */
+  --color-brutal-blue: #1d4ed8;
   --color-brutal-lime: #b6ff3a;
 
   --font-display: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
