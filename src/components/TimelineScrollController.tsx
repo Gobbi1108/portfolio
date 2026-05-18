@@ -52,18 +52,21 @@ export default function TimelineScrollController() {
     setReducedMotion(mql.matches);
 
     let cancelled = false;
-    let gsapModule: GsapModule | null = null;
+    let gsapPromise: Promise<GsapModule> | null = null;
     let frameTrigger: ScrollTriggerInstance | null = null;
+    let frameTriggerBuilding = false;
     const sceneTriggers: ScrollTriggerInstance[] = [];
+    let sceneTriggersBuilding = false;
     let controller: TimelineCharacterController | undefined;
     let lastFrame = -1;
 
+    // Cache the import promise so concurrent callers share a single fetch.
+    // Without this, two awaits could each trigger an import() before either
+    // resolves and then race to build duplicate triggers.
     const ensureGsap = async (): Promise<GsapModule | null> => {
-      if (gsapModule) return gsapModule;
-      const mod = await import("../lib/gsap");
-      if (cancelled) return null;
-      gsapModule = mod;
-      return mod;
+      if (!gsapPromise) gsapPromise = import("../lib/gsap");
+      const mod = await gsapPromise;
+      return cancelled ? null : mod;
     };
 
     const updateFrame = (progress: number) => {
@@ -79,51 +82,73 @@ export default function TimelineScrollController() {
     };
 
     const buildFrameTrigger = async () => {
-      if (cancelled || mql.matches || frameTrigger) return;
+      if (cancelled || mql.matches || frameTrigger || frameTriggerBuilding) return;
       controller = getCharacterController();
       if (!controller) return;
 
-      const m = await ensureGsap();
-      if (!m || cancelled) return;
+      frameTriggerBuilding = true;
+      try {
+        const m = await ensureGsap();
+        if (!m || cancelled || mql.matches || frameTrigger) return;
 
-      const trigger = document.querySelector(TIMELINE_SELECTOR);
-      if (!trigger) return;
+        const trigger = document.querySelector(TIMELINE_SELECTOR);
+        if (!trigger) return;
 
-      // Pause autoplay so scrub fully owns the frame.
-      controller.pause();
+        // Pause autoplay so scrub fully owns the frame.
+        controller.pause();
 
-      frameTrigger = m.ScrollTrigger.create({
-        trigger,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: true,
-        onUpdate: (self) => updateFrame(self.progress),
-      });
+        frameTrigger = m.ScrollTrigger.create({
+          trigger,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+          onUpdate: (self) => updateFrame(self.progress),
+        });
 
-      // Seed initial frame for current scroll position.
-      updateFrame(frameTrigger.progress ?? 0);
+        // Seed initial frame for current scroll position.
+        updateFrame(frameTrigger.progress ?? 0);
+      } finally {
+        frameTriggerBuilding = false;
+      }
     };
 
     // Scene transitions: while a scene's center crosses the viewport center,
     // its `.is-active` class toggles on, revealing the decorative props (see
     // `.scene-prop` rules in Timeline.astro). Independent of the Lottie
     // controller so props still animate even if Lottie fails to load.
+    //
+    // The in-flight flag prevents concurrent invocations (e.g. rapid toggles
+    // of prefers-reduced-motion) from racing past the empty-array guard
+    // before any trigger is pushed, which would create duplicate triggers.
     const buildSceneTriggers = async () => {
-      if (cancelled || mql.matches || sceneTriggers.length > 0) return;
-      const m = await ensureGsap();
-      if (!m || cancelled) return;
+      if (
+        cancelled ||
+        mql.matches ||
+        sceneTriggers.length > 0 ||
+        sceneTriggersBuilding
+      ) {
+        return;
+      }
 
-      for (const id of SCENE_IDS) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-        sceneTriggers.push(
-          m.ScrollTrigger.create({
-            trigger: el,
-            start: "top center",
-            end: "bottom center",
-            toggleClass: { targets: el, className: SCENE_ACTIVE_CLASS },
-          }),
-        );
+      sceneTriggersBuilding = true;
+      try {
+        const m = await ensureGsap();
+        if (!m || cancelled || mql.matches || sceneTriggers.length > 0) return;
+
+        for (const id of SCENE_IDS) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          sceneTriggers.push(
+            m.ScrollTrigger.create({
+              trigger: el,
+              start: "top center",
+              end: "bottom center",
+              toggleClass: { targets: el, className: SCENE_ACTIVE_CLASS },
+            }),
+          );
+        }
+      } finally {
+        sceneTriggersBuilding = false;
       }
     };
 

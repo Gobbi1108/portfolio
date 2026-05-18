@@ -136,7 +136,12 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
             </span>
           </div>
 
-          {/* Props decorativos por cenário. Hidden até `.scene.is-active`. */}
+          {/*
+            Props decorativos por cenário. Hidden até `.scene.is-active`.
+            Cores e fontes ficam em classes utilitárias (`.fx-*`, `.sx-*`,
+            `.ff-display`) definidas no <style> abaixo, que mapeiam para os
+            tokens do tema em `src/styles/global.css`.
+          */}
           {scene.id === "scene-baby" && (
             <>
               <div
@@ -147,10 +152,10 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
               >
                 {/* Chocalho */}
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
-                  <circle cx="32" cy="22" r="14" fill="#ff4fa8" stroke="#0a0a0a" stroke-width="3" />
-                  <circle cx="32" cy="22" r="4" fill="#0a0a0a" />
-                  <rect x="29" y="34" width="6" height="22" fill="#0a0a0a" />
-                  <circle cx="32" cy="58" r="4" fill="#2b6cff" stroke="#0a0a0a" stroke-width="2" />
+                  <circle cx="32" cy="22" r="14" class="fx-pink sx-black" stroke-width="3" />
+                  <circle cx="32" cy="22" r="4" class="fx-black" />
+                  <rect x="29" y="34" width="6" height="22" class="fx-black" />
+                  <circle cx="32" cy="58" r="4" class="fx-blue sx-black" stroke-width="2" />
                 </svg>
               </div>
               <div
@@ -161,10 +166,10 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
               >
                 {/* Mamadeira */}
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
-                  <rect x="20" y="14" width="24" height="40" fill="#2b6cff" stroke="#0a0a0a" stroke-width="3" />
-                  <rect x="26" y="6" width="12" height="10" fill="#ffd400" stroke="#0a0a0a" stroke-width="3" />
-                  <line x1="20" y1="28" x2="44" y2="28" stroke="#0a0a0a" stroke-width="2" />
-                  <line x1="20" y1="38" x2="44" y2="38" stroke="#0a0a0a" stroke-width="2" />
+                  <rect x="20" y="14" width="24" height="40" class="fx-blue sx-black" stroke-width="3" />
+                  <rect x="26" y="6" width="12" height="10" class="fx-yellow sx-black" stroke-width="3" />
+                  <line x1="20" y1="28" x2="44" y2="28" class="sx-black" stroke-width="2" />
+                  <line x1="20" y1="38" x2="44" y2="38" class="sx-black" stroke-width="2" />
                 </svg>
               </div>
               <div
@@ -175,11 +180,11 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
               >
                 {/* Berço — grades */}
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
-                  <rect x="6" y="20" width="52" height="36" fill="#ece6d6" stroke="#0a0a0a" stroke-width="3" />
-                  <line x1="16" y1="20" x2="16" y2="56" stroke="#0a0a0a" stroke-width="3" />
-                  <line x1="26" y1="20" x2="26" y2="56" stroke="#0a0a0a" stroke-width="3" />
-                  <line x1="36" y1="20" x2="36" y2="56" stroke="#0a0a0a" stroke-width="3" />
-                  <line x1="46" y1="20" x2="46" y2="56" stroke="#0a0a0a" stroke-width="3" />
+                  <rect x="6" y="20" width="52" height="36" class="fx-bone sx-black" stroke-width="3" />
+                  <line x1="16" y1="20" x2="16" y2="56" class="sx-black" stroke-width="3" />
+                  <line x1="26" y1="20" x2="26" y2="56" class="sx-black" stroke-width="3" />
+                  <line x1="36" y1="20" x2="36" y2="56" class="sx-black" stroke-width="3" />
+                  <line x1="46" y1="20" x2="46" y2="56" class="sx-black" stroke-width="3" />
                 </svg>
               </div>
             </>
@@ -195,9 +200,9 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
               >
                 {/* Pião */}
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
-                  <polygon points="10,20 54,20 32,54" fill="#ff4fa8" stroke="#0a0a0a" stroke-width="3" stroke-linejoin="round" />
-                  <rect x="28" y="6" width="8" height="16" fill="#0a0a0a" />
-                  <circle cx="32" cy="58" r="3" fill="#0a0a0a" />
+                  <polygon points="10,20 54,20 32,54" class="fx-pink sx-black" stroke-width="3" stroke-linejoin="round" />
+                  <rect x="28" y="6" width="8" height="16" class="fx-black" />
+                  <circle cx="32" cy="58" r="3" class="fx-black" />
                 </svg>
               </div>
               <div
@@ -208,14 +213,13 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
               >
                 {/* Bloco ABC */}
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
-                  <rect x="10" y="10" width="44" height="44" fill="#2b6cff" stroke="#0a0a0a" stroke-width="3" />
+                  <rect x="10" y="10" width="44" height="44" class="fx-blue sx-black" stroke-width="3" />
                   <text
                     x="32"
                     y="44"
                     text-anchor="middle"
-                    font-family="Archivo Black, sans-serif"
+                    class="ff-display fx-paper"
                     font-size="28"
-                    fill="#faf7f0"
                   >
                     A
                   </text>
@@ -229,9 +233,9 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
               >
                 {/* Balão */}
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
-                  <ellipse cx="32" cy="24" rx="16" ry="20" fill="#ff4fa8" stroke="#0a0a0a" stroke-width="3" />
-                  <polygon points="28,42 36,42 32,48" fill="#0a0a0a" />
-                  <path d="M32 48 Q28 54 32 60" stroke="#0a0a0a" stroke-width="2" fill="none" />
+                  <ellipse cx="32" cy="24" rx="16" ry="20" class="fx-pink sx-black" stroke-width="3" />
+                  <polygon points="28,42 36,42 32,48" class="fx-black" />
+                  <path d="M32 48 Q28 54 32 60" class="sx-black" stroke-width="2" fill="none" />
                 </svg>
               </div>
             </>
@@ -249,12 +253,11 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
                   <path
                     d="M32 6 L40 22 L50 18 L42 32 L52 38 L32 44 L12 38 L22 32 L14 18 L24 22 Z"
-                    fill="#ff4fa8"
-                    stroke="#0a0a0a"
+                    class="fx-pink sx-black"
                     stroke-width="3"
                     stroke-linejoin="round"
                   />
-                  <rect x="12" y="44" width="40" height="6" fill="#0a0a0a" />
+                  <rect x="12" y="44" width="40" height="6" class="fx-black" />
                 </svg>
               </div>
               <div
@@ -265,10 +268,10 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
               >
                 {/* Bússola */}
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
-                  <circle cx="32" cy="32" r="24" fill="#faf7f0" stroke="#0a0a0a" stroke-width="3" />
-                  <polygon points="32,12 28,32 32,32" fill="#ff4fa8" stroke="#0a0a0a" stroke-width="2" stroke-linejoin="round" />
-                  <polygon points="32,52 32,32 36,32" fill="#0a0a0a" />
-                  <circle cx="32" cy="32" r="3" fill="#0a0a0a" />
+                  <circle cx="32" cy="32" r="24" class="fx-paper sx-black" stroke-width="3" />
+                  <polygon points="32,12 28,32 32,32" class="fx-pink sx-black" stroke-width="2" stroke-linejoin="round" />
+                  <polygon points="32,52 32,32 36,32" class="fx-black" />
+                  <circle cx="32" cy="32" r="3" class="fx-black" />
                 </svg>
               </div>
               <div
@@ -281,19 +284,17 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
                   <path
                     d="M32 6 Q44 22 32 34 Q20 22 32 6 Z"
-                    fill="#ff4fa8"
-                    stroke="#0a0a0a"
+                    class="fx-pink sx-black"
                     stroke-width="3"
                     stroke-linejoin="round"
                   />
                   <path
                     d="M32 18 Q40 28 32 36 Q24 28 32 18 Z"
-                    fill="#ffd400"
-                    stroke="#0a0a0a"
+                    class="fx-yellow sx-black"
                     stroke-width="2"
                   />
-                  <line x1="10" y1="52" x2="54" y2="58" stroke="#0a0a0a" stroke-width="4" />
-                  <line x1="54" y1="52" x2="10" y2="58" stroke="#0a0a0a" stroke-width="4" />
+                  <line x1="10" y1="52" x2="54" y2="58" class="sx-black" stroke-width="4" />
+                  <line x1="54" y1="52" x2="10" y2="58" class="sx-black" stroke-width="4" />
                 </svg>
               </div>
             </>
@@ -309,20 +310,19 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
               >
                 {/* Laptop */}
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
-                  <rect x="10" y="14" width="44" height="30" fill="#0a0a0a" stroke="#0a0a0a" stroke-width="3" />
-                  <rect x="14" y="18" width="36" height="22" fill="#b6ff3a" />
+                  <rect x="10" y="14" width="44" height="30" class="fx-black sx-black" stroke-width="3" />
+                  <rect x="14" y="18" width="36" height="22" class="fx-lime" />
                   <text
                     x="32"
                     y="34"
                     text-anchor="middle"
-                    font-family="ui-monospace, Menlo, monospace"
+                    class="ff-mono fx-black"
                     font-size="14"
                     font-weight="700"
-                    fill="#0a0a0a"
                   >
                     {">_"}
                   </text>
-                  <rect x="4" y="44" width="56" height="6" fill="#faf7f0" stroke="#0a0a0a" stroke-width="3" />
+                  <rect x="4" y="44" width="56" height="6" class="fx-paper sx-black" stroke-width="3" />
                 </svg>
               </div>
               <div
@@ -337,10 +337,8 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
                     x="32"
                     y="50"
                     text-anchor="middle"
-                    font-family="Archivo Black, sans-serif"
+                    class="ff-display fx-yellow sx-black"
                     font-size="56"
-                    fill="#ffd400"
-                    stroke="#0a0a0a"
                     stroke-width="2"
                   >
                     {"{ }"}
@@ -355,9 +353,9 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
               >
                 {/* Cursor / barras de código */}
                 <svg viewBox="0 0 64 64" class="block h-full w-full">
-                  <rect x="14" y="10" width="8" height="44" fill="#ff4fa8" stroke="#0a0a0a" stroke-width="3" />
-                  <rect x="28" y="10" width="8" height="44" fill="#b6ff3a" stroke="#0a0a0a" stroke-width="3" />
-                  <rect x="42" y="10" width="8" height="44" fill="#ffd400" stroke="#0a0a0a" stroke-width="3" />
+                  <rect x="14" y="10" width="8" height="44" class="fx-pink sx-black" stroke-width="3" />
+                  <rect x="28" y="10" width="8" height="44" class="fx-lime sx-black" stroke-width="3" />
+                  <rect x="42" y="10" width="8" height="44" class="fx-yellow sx-black" stroke-width="3" />
                 </svg>
               </div>
             </>
@@ -410,5 +408,22 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
       transform: none;
       transition: none;
     }
+  }
+
+  /* Mapas para os tokens do tema (src/styles/global.css). Aplicados em
+     <circle>, <rect>, <text>, etc. dentro dos SVGs decorativos. Isolados
+     no escopo de `.scene-prop` para não vazar para outros SVGs do site. */
+  .scene-prop .fx-pink { fill: var(--color-brutal-pink); }
+  .scene-prop .fx-blue { fill: var(--color-brutal-blue); }
+  .scene-prop .fx-yellow { fill: var(--color-brutal-yellow); }
+  .scene-prop .fx-lime { fill: var(--color-brutal-lime); }
+  .scene-prop .fx-black { fill: var(--color-brutal-black); }
+  .scene-prop .fx-paper { fill: var(--color-brutal-paper); }
+  .scene-prop .fx-bone { fill: var(--color-brutal-bone); }
+  .scene-prop .sx-black { stroke: var(--color-brutal-black); }
+  .scene-prop .ff-display { font-family: var(--font-display); }
+  /* Sem token de fonte mono no tema; mantém stack genérica do sistema. */
+  .scene-prop .ff-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 </style>
