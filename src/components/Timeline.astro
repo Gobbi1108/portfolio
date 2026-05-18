@@ -1,19 +1,21 @@
 ---
-// Timeline — estrutura base (PR #4) + personagem Lottie (PR #5)
+// Timeline — estrutura base (PR #4) + personagem Lottie (PR #5) + scroll-driven (PR #6)
 //
 // 4 cenas verticais (baby → child → scout → tech), cada uma full-bleed com
 // cor distinta da paleta brutalista e um placeholder retangular `[cenário]`.
 // Uma "janela do personagem" fica sticky ao centro da viewport e atravessa
-// todas as cenas; dentro dela vive o player Lottie (TimelineCharacter), que
-// roda em loop e respeita prefers-reduced-motion.
+// todas as cenas; dentro dela vive o player Lottie (TimelineCharacter).
+//
+// TimelineScrollController conecta o scroll ao frame do Lottie via GSAP
+// ScrollTrigger e adiciona navegação por teclado (Arrow/PageUp/Down). Em
+// prefers-reduced-motion: reduce, desliga o scrub e mostra atalhos âncora.
 //
 // Roadmap:
-//   PR #6: scroll-driven — sincronizar progresso da cena com frame do Lottie.
-//          O player já expõe window.__timelineCharacter.goToAndStop para isso.
 //   PR #7: cenário interno de cada `.scene` (props flutuando, etc).
 //   PR #8: textos finais de cada fase.
 
 import TimelineCharacter from "./TimelineCharacter.tsx";
+import TimelineScrollController from "./TimelineScrollController.tsx";
 
 interface Scene {
   id: string;
@@ -128,6 +130,8 @@ const scenes: Scene[] = [
       ))
     }
   </div>
+
+  <TimelineScrollController client:visible />
 </section>
 
 <style>
