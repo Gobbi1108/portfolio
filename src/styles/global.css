@@ -105,7 +105,10 @@
 }
 
 @utility btn-brutal-hover {
-  &:hover {
+  /* Hover e focus-visible compartilham o mesmo deslocamento para que usuários
+     de teclado tenham o mesmo feedback visual que usuários de mouse. */
+  &:hover,
+  &:focus-visible {
     transform: translate(4px, 4px);
     box-shadow: none;
   }
@@ -116,9 +119,41 @@
   @media (prefers-reduced-motion: reduce) {
     transition: none;
     &:hover,
-    &:active {
+    &:active,
+    &:focus-visible {
       transform: none;
       box-shadow: var(--shadow-brutal-md);
+    }
+  }
+}
+
+/* Link/chip brutalista: estado padrão sem moldura visível (border transparente
+   pré-aloca o espaço para evitar layout shift). Em hover/focus, ganha borda
+   preta, fundo amarelo e sombra dura, deslocando 2px para cima/esquerda. */
+@utility brutal-link {
+  display: inline-flex;
+  align-items: center;
+  border: var(--border-brutal-width) solid transparent;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    border-color 120ms ease,
+    background-color 120ms ease;
+  &:hover,
+  &:focus-visible {
+    transform: translate(-2px, -2px);
+    border-color: var(--color-brutal-black);
+    background-color: var(--color-brutal-yellow);
+    box-shadow: var(--shadow-brutal-sm);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    &:hover,
+    &:focus-visible {
+      transform: none;
+      box-shadow: none;
+      border-color: transparent;
+      background-color: transparent;
     }
   }
 }
@@ -128,4 +163,102 @@
   border: var(--border-brutal-width) solid var(--color-brutal-black);
   box-shadow: var(--shadow-brutal-md);
   padding: 1.5rem;
+}
+
+/* Reveal de seção: fade + slide curto. Estado inicial só é aplicado quando
+   o documento marca `data-reveal-ready` no <html>, garantindo que clientes
+   sem JS (ou antes do bootstrap rodar) vejam o conteúdo normalmente. O
+   módulo `src/lib/sectionReveal.ts` adiciona a marca e cria ScrollTriggers
+   que ativam `is-revealed` no enter. Em prefers-reduced-motion, o módulo
+   já marca tudo como revelado e o bloco de fallback abaixo neutraliza a
+   transição mesmo se algo escapar. */
+html[data-reveal-ready] [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 320ms ease-out,
+    transform 320ms ease-out;
+  will-change: opacity, transform;
+}
+
+html[data-reveal-ready] [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-reveal-ready] [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Skeleton brutalista: faixas diagonais chapadas com deslocamento por etapas
+   (sem fade suave). Usado como fallback de carregamento dentro de slots que
+   recebem ilhas pesadas (HeroCanvas via R3F, TimelineCharacter via lottie).
+   O slot recebe `data-state="loading"` no SSR e React troca para
+   `data-state="loaded"` quando o conteúdo está pronto, escondendo o overlay. */
+.brutal-skeleton {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-brutal-bone);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-brutal-black) 0,
+    var(--color-brutal-black) 2px,
+    var(--color-brutal-bone) 2px,
+    var(--color-brutal-bone) 12px
+  );
+  pointer-events: none;
+  animation: brutal-skeleton-shift 900ms steps(6) infinite;
+}
+
+@keyframes brutal-skeleton-shift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 24px 0;
+  }
+}
+
+[data-state="loaded"] > .brutal-skeleton {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brutal-skeleton {
+    animation: none;
+  }
+}
+
+/* Cursor customizado opcional no Hero. O bloco `[data-hero-cursor]` recebe
+   `cursor: none` apenas quando JS confirma que pointer fino + motion ok; ver
+   `src/components/HeroCursor.tsx`. !important justificado: filhos do hero
+   (botão CTA com `cursor: pointer`) precisam ceder ao cursor custom sem
+   reescrever cada utilitária. */
+[data-hero-cursor].hero-cursor-active,
+[data-hero-cursor].hero-cursor-active * {
+  cursor: none !important;
+}
+
+.hero-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  background-color: var(--color-brutal-pink);
+  border: var(--border-brutal-width) solid var(--color-brutal-black);
+  box-shadow: var(--shadow-brutal-sm);
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0;
+  transition: opacity 120ms linear;
+}
+
+.hero-cursor[data-visible="true"] {
+  opacity: 1;
 }

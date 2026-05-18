@@ -41,8 +41,10 @@ const {
           Portfolio<span class="text-brutal-pink">.</span>
         </a>
         <nav aria-label="Principal" class="flex items-center gap-2">
-          <a href="/" class="px-3 py-2 font-display text-sm uppercase">Home</a>
-          <a href="/styleguide" class="px-3 py-2 font-display text-sm uppercase"
+          <a href="/" class="brutal-link px-3 py-2 font-display text-sm uppercase">Home</a>
+          <a
+            href="/styleguide"
+            class="brutal-link px-3 py-2 font-display text-sm uppercase"
             >Styleguide</a
           >
         </nav>
@@ -65,5 +67,10 @@ const {
         <p class="text-sm opacity-70">Construído com Astro + Tailwind v4.</p>
       </div>
     </footer>
+
+    <script>
+      import { initSectionReveal } from "../lib/sectionReveal";
+      initSectionReveal();
+    </script>
   </body>
 </html>

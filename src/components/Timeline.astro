@@ -92,8 +92,10 @@ const slotBR = "bottom-10 right-6 sm:bottom-14 sm:right-10";
   >
     <div
       data-character-slot
-      class="character-window border-brutal-thick bg-brutal-paper shadow-brutal-xl flex aspect-square w-40 items-center justify-center overflow-hidden sm:w-48 md:w-56 lg:w-64"
+      data-state="loading"
+      class="character-window border-brutal-thick bg-brutal-paper shadow-brutal-xl relative flex aspect-square w-40 items-center justify-center overflow-hidden sm:w-48 md:w-56 lg:w-64"
     >
+      <div class="brutal-skeleton" aria-hidden="true"></div>
       <TimelineCharacter client:visible />
     </div>
   </div>
