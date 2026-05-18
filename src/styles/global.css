@@ -23,6 +23,14 @@
   --shadow-brutal-lg: 8px 8px 0 0 var(--color-brutal-black);
   --shadow-brutal-xl: 12px 12px 0 0 var(--color-brutal-black);
 
+  /* Variantes invertidas: sombra projetada para o canto oposto. Usadas em
+     estados :hover de cards/links que devem flipar a direção da sombra
+     sem mover o elemento (diferente do btn-brutal-hover, que translada). */
+  --shadow-brutal-sm-inv: -2px -2px 0 0 var(--color-brutal-black);
+  --shadow-brutal-md-inv: -4px -4px 0 0 var(--color-brutal-black);
+  --shadow-brutal-lg-inv: -8px -8px 0 0 var(--color-brutal-black);
+  --shadow-brutal-xl-inv: -12px -12px 0 0 var(--color-brutal-black);
+
   --radius-brutal: 0px;
 }
 
