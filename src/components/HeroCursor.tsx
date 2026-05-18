@@ -24,9 +24,14 @@ export default function HeroCursor() {
     const reduced = window.matchMedia(REDUCED_MOTION_QUERY).matches;
     if (coarse || reduced) return;
 
-    const host = document.querySelector<HTMLElement>(HOST_SELECTOR);
     const cursor = cursorRef.current;
-    if (!host || !cursor) return;
+    if (!cursor) return;
+
+    // `closest` mantém o componente desacoplado de um seletor global e
+    // permite múltiplas instâncias (caso outro hero/host apareça no DOM)
+    // sem o risco do cursor se anexar ao host errado.
+    const host = cursor.closest<HTMLElement>(HOST_SELECTOR);
+    if (!host) return;
 
     host.classList.add(ACTIVE_CLASS);
 
