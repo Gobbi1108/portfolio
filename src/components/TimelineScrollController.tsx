@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import type { TimelineCharacterController } from "./TimelineCharacter.tsx";
 
-// Scroll/keyboard controller for Timeline (PR #6).
+// Scroll/keyboard controller for Timeline (PR #6) + scene transitions (PR #9).
 //
-// Connects scroll progress over `.timeline` to the Lottie character frame
-// exposed by PR #5 (`window.__timelineCharacter`). Adds keyboard navigation
-// (Arrow Up/Down, PageUp/Down), and falls back to anchor links when the user
-// prefers reduced motion.
+// - Connects scroll progress over `.timeline` to the Lottie character frame
+//   exposed by PR #5 (`window.__timelineCharacter`).
+// - Adds keyboard navigation (Arrow Up/Down, PageUp/Down).
+// - Toggles `.is-active` on each scene while its center crosses the viewport
+//   center (i.e. while the sticky character is on top of it), driving the
+//   entrance/exit of decorative props rendered inline in Timeline.astro.
+// - Falls back to anchor links when the user prefers reduced motion. The
+//   reduced-motion stylesheet keeps props visible regardless of class state.
 //
 // Rendered as a React island via `client:visible` so GSAP only ships once the
 // Timeline is on screen. GSAP and ScrollTrigger are pulled from the central
@@ -25,6 +29,7 @@ const SCENE_LABELS: Record<(typeof SCENE_IDS)[number], string> = {
   "scene-scout": "Escoteiro",
   "scene-tech": "Tech",
 };
+const SCENE_ACTIVE_CLASS = "is-active";
 
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -47,10 +52,19 @@ export default function TimelineScrollController() {
     setReducedMotion(mql.matches);
 
     let cancelled = false;
-    let scrollTrigger: ScrollTriggerInstance | null = null;
     let gsapModule: GsapModule | null = null;
+    let frameTrigger: ScrollTriggerInstance | null = null;
+    const sceneTriggers: ScrollTriggerInstance[] = [];
     let controller: TimelineCharacterController | undefined;
     let lastFrame = -1;
+
+    const ensureGsap = async (): Promise<GsapModule | null> => {
+      if (gsapModule) return gsapModule;
+      const mod = await import("../lib/gsap");
+      if (cancelled) return null;
+      gsapModule = mod;
+      return mod;
+    };
 
     const updateFrame = (progress: number) => {
       if (!controller) return;
@@ -64,15 +78,13 @@ export default function TimelineScrollController() {
       controller.goToAndStop(frame, true);
     };
 
-    const buildScrollTrigger = async () => {
-      if (cancelled || mql.matches || scrollTrigger) return;
+    const buildFrameTrigger = async () => {
+      if (cancelled || mql.matches || frameTrigger) return;
       controller = getCharacterController();
       if (!controller) return;
 
-      if (!gsapModule) {
-        gsapModule = await import("../lib/gsap");
-        if (cancelled) return;
-      }
+      const m = await ensureGsap();
+      if (!m || cancelled) return;
 
       const trigger = document.querySelector(TIMELINE_SELECTOR);
       if (!trigger) return;
@@ -80,7 +92,7 @@ export default function TimelineScrollController() {
       // Pause autoplay so scrub fully owns the frame.
       controller.pause();
 
-      scrollTrigger = gsapModule.ScrollTrigger.create({
+      frameTrigger = m.ScrollTrigger.create({
         trigger,
         start: "top top",
         end: "bottom bottom",
@@ -89,13 +101,36 @@ export default function TimelineScrollController() {
       });
 
       // Seed initial frame for current scroll position.
-      updateFrame(scrollTrigger.progress ?? 0);
+      updateFrame(frameTrigger.progress ?? 0);
     };
 
-    const teardownScrollTrigger = () => {
-      if (scrollTrigger) {
-        scrollTrigger.kill();
-        scrollTrigger = null;
+    // Scene transitions: while a scene's center crosses the viewport center,
+    // its `.is-active` class toggles on, revealing the decorative props (see
+    // `.scene-prop` rules in Timeline.astro). Independent of the Lottie
+    // controller so props still animate even if Lottie fails to load.
+    const buildSceneTriggers = async () => {
+      if (cancelled || mql.matches || sceneTriggers.length > 0) return;
+      const m = await ensureGsap();
+      if (!m || cancelled) return;
+
+      for (const id of SCENE_IDS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        sceneTriggers.push(
+          m.ScrollTrigger.create({
+            trigger: el,
+            start: "top center",
+            end: "bottom center",
+            toggleClass: { targets: el, className: SCENE_ACTIVE_CLASS },
+          }),
+        );
+      }
+    };
+
+    const teardownFrameTrigger = () => {
+      if (frameTrigger) {
+        frameTrigger.kill();
+        frameTrigger = null;
       }
       lastFrame = -1;
       // Resume looping playback when scrub is disabled.
@@ -103,18 +138,30 @@ export default function TimelineScrollController() {
       if (controller && !mql.matches) controller.play();
     };
 
+    const teardownSceneTriggers = () => {
+      for (const t of sceneTriggers) t.kill();
+      sceneTriggers.length = 0;
+      // ScrollTrigger.kill() leaves the toggled class as-is — clean it up
+      // explicitly so the next build doesn't start from a stale state.
+      for (const id of SCENE_IDS) {
+        document.getElementById(id)?.classList.remove(SCENE_ACTIVE_CLASS);
+      }
+    };
+
     const handleReady = (event: Event) => {
       const detail = (event as CustomEvent<TimelineCharacterController>).detail;
       controller = detail ?? getCharacterController();
-      void buildScrollTrigger();
+      void buildFrameTrigger();
     };
 
     const handleMotionChange = () => {
       setReducedMotion(mql.matches);
       if (mql.matches) {
-        teardownScrollTrigger();
+        teardownFrameTrigger();
+        teardownSceneTriggers();
       } else {
-        void buildScrollTrigger();
+        void buildFrameTrigger();
+        void buildSceneTriggers();
       }
     };
 
@@ -152,9 +199,12 @@ export default function TimelineScrollController() {
       }
     };
 
+    // Scene triggers don't depend on the Lottie controller, build immediately.
+    void buildSceneTriggers();
+
     // Controller might already be ready before mount (race with client:visible).
     if (getCharacterController()) {
-      void buildScrollTrigger();
+      void buildFrameTrigger();
     }
     window.addEventListener("timeline:character:ready", handleReady);
     window.addEventListener("keydown", handleKeydown);
@@ -165,7 +215,8 @@ export default function TimelineScrollController() {
       window.removeEventListener("timeline:character:ready", handleReady);
       window.removeEventListener("keydown", handleKeydown);
       mql.removeEventListener("change", handleMotionChange);
-      teardownScrollTrigger();
+      teardownFrameTrigger();
+      teardownSceneTriggers();
     };
   }, []);
 
