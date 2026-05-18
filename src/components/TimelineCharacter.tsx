@@ -75,6 +75,10 @@ export default function TimelineCharacter() {
         if (cancelled) return;
         if (reduced) anim.goToAndStop(0, true);
 
+        // Sinaliza ao slot host (`[data-character-slot]`) que o lottie está
+        // pronto, escondendo o `.brutal-skeleton` overlay via CSS.
+        container.closest("[data-character-slot]")?.setAttribute("data-state", "loaded");
+
         const controller: TimelineCharacterController = {
           goToAndStop: (value, isFrame = true) => anim.goToAndStop(value, isFrame),
           goToAndPlay: (value, isFrame = true) => anim.goToAndPlay(value, isFrame),

@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import avatar from "../assets/images/avatar_model.png";
 import HeroCanvas from "./HeroCanvas.tsx";
+import HeroCursor from "./HeroCursor.tsx";
 
 interface Props {
   name?: string;
@@ -22,6 +23,7 @@ const {
 
 <section
   aria-labelledby="hero-title"
+  data-hero-cursor
   class="relative py-12 md:py-20"
 >
   <div
@@ -43,9 +45,11 @@ const {
 
       <div
         data-3d-slot
+        data-state="loading"
         aria-hidden="true"
         class="pointer-events-none absolute -right-6 -top-6 z-10 hidden h-24 w-24 md:block lg:-right-10 lg:-top-10 lg:h-32 lg:w-32"
       >
+        <div class="brutal-skeleton" aria-hidden="true"></div>
         <HeroCanvas client:visible />
       </div>
     </div>
@@ -70,4 +74,6 @@ const {
       </div>
     </div>
   </div>
+
+  <HeroCursor client:idle />
 </section>

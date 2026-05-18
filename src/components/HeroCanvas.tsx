@@ -77,6 +77,14 @@ export default function HeroCanvas() {
       camera={{ position: [0, 0, 3.2], fov: 45 }}
       gl={{ antialias: true, alpha: true }}
       style={{ width: "100%", height: "100%" }}
+      onCreated={({ gl }) => {
+        // Sinaliza ao slot host (`[data-3d-slot]`) que o renderer está pronto.
+        // O CSS de `.brutal-skeleton` esconde o overlay quando o slot vira
+        // `data-state="loaded"`. `closest` evita acoplamento por seletor global.
+        gl.domElement
+          .closest<HTMLElement>("[data-3d-slot]")
+          ?.setAttribute("data-state", "loaded");
+      }}
     >
       <Suspense fallback={null}>
         <ambientLight intensity={0.6} />
