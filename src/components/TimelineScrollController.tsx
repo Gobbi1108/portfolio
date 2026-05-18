@@ -5,11 +5,16 @@ import type { TimelineCharacterController } from "./TimelineCharacter.tsx";
 //
 // Connects scroll progress over `.timeline` to the Lottie character frame
 // exposed by PR #5 (`window.__timelineCharacter`). Adds keyboard navigation
-// (Arrow Up/Down, PageUp/Down) that smoothly scrolls the viewport, and falls
-// back to anchor links when the user prefers reduced motion.
+// (Arrow Up/Down, PageUp/Down), and falls back to anchor links when the user
+// prefers reduced motion.
 //
 // Rendered as a React island via `client:visible` so GSAP only ships once the
-// Timeline is on screen.
+// Timeline is on screen. GSAP and ScrollTrigger are pulled from the central
+// registration module `src/lib/gsap.ts` via dynamic import.
+
+// Type-only import — does not pull GSAP into the bundle here.
+type GsapModule = typeof import("../lib/gsap");
+type ScrollTriggerInstance = InstanceType<GsapModule["ScrollTrigger"]>;
 
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const TIMELINE_SELECTOR = ".timeline";
@@ -42,11 +47,8 @@ export default function TimelineScrollController() {
     setReducedMotion(mql.matches);
 
     let cancelled = false;
-    // ScrollTrigger instance — typed loose since we lazy-load GSAP.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let scrollTrigger: any = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let ScrollTrigger: any = null;
+    let scrollTrigger: ScrollTriggerInstance | null = null;
+    let gsapModule: GsapModule | null = null;
     let controller: TimelineCharacterController | undefined;
     let lastFrame = -1;
 
@@ -67,12 +69,9 @@ export default function TimelineScrollController() {
       controller = getCharacterController();
       if (!controller) return;
 
-      if (!ScrollTrigger) {
-        const gsapMod = await import("gsap");
-        const stMod = await import("gsap/ScrollTrigger");
+      if (!gsapModule) {
+        gsapModule = await import("../lib/gsap");
         if (cancelled) return;
-        ScrollTrigger = stMod.ScrollTrigger;
-        gsapMod.gsap.registerPlugin(ScrollTrigger);
       }
 
       const trigger = document.querySelector(TIMELINE_SELECTOR);
@@ -81,12 +80,12 @@ export default function TimelineScrollController() {
       // Pause autoplay so scrub fully owns the frame.
       controller.pause();
 
-      scrollTrigger = ScrollTrigger.create({
+      scrollTrigger = gsapModule.ScrollTrigger.create({
         trigger,
         start: "top top",
         end: "bottom bottom",
         scrub: true,
-        onUpdate: (self: { progress: number }) => updateFrame(self.progress),
+        onUpdate: (self) => updateFrame(self.progress),
       });
 
       // Seed initial frame for current scroll position.
@@ -119,9 +118,11 @@ export default function TimelineScrollController() {
       }
     };
 
+    // Brutalism is dry — instant scroll, no smooth easing. Also matches the
+    // behaviour required when prefers-reduced-motion is active.
     const scrollViewport = (deltaVh: number) => {
       const distance = (window.innerHeight * deltaVh) / 100;
-      window.scrollBy({ top: distance, left: 0, behavior: "smooth" });
+      window.scrollBy({ top: distance, left: 0, behavior: "auto" });
     };
 
     const handleKeydown = (event: KeyboardEvent) => {
@@ -183,7 +184,7 @@ export default function TimelineScrollController() {
           <li key={id}>
             <a
               href={`#${id}`}
-              className="font-display text-brutal-ink hover:text-brutal-blue uppercase tracking-wider"
+              className="font-display text-brutal-ink hover:text-brutal-blue hover:-translate-y-1 transition-transform duration-100 inline-block uppercase tracking-wider"
             >
               {String(index + 1).padStart(2, "0")} — {SCENE_LABELS[id]}
             </a>
