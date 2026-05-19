@@ -8,7 +8,8 @@ const colors: { name: string; cls: string; hex: string; onDark?: boolean }[] = [
   { name: "bone", cls: "bg-brutal-bone", hex: "#ece6d6" },
   { name: "yellow", cls: "bg-brutal-yellow", hex: "#ffd400" },
   { name: "pink", cls: "bg-brutal-pink", hex: "#ff4fa8" },
-  { name: "blue", cls: "bg-brutal-blue", hex: "#2b6cff", onDark: true },
+  { name: "magenta", cls: "bg-brutal-magenta", hex: "#b3155f", onDark: true },
+  { name: "blue", cls: "bg-brutal-blue", hex: "#1d4ed8", onDark: true },
   { name: "lime", cls: "bg-brutal-lime", hex: "#b6ff3a" },
 ];
 
@@ -22,7 +23,7 @@ const shadows = [
 
 <BaseLayout title="Styleguide — Portfolio" description="Tokens neubrutalistas.">
   <header class="mb-12">
-    <p class="font-display text-sm uppercase tracking-widest text-brutal-pink">
+    <p class="font-display text-sm uppercase tracking-widest text-brutal-magenta">
       Design System
     </p>
     <h1 class="mt-2">Styleguide</h1>
@@ -53,31 +54,31 @@ const shadows = [
     <h2 id="typography" class="mb-6">Tipografia</h2>
     <div class="card-brutal space-y-4">
       <div>
-        <p class="font-mono text-xs uppercase opacity-60">H1 — display</p>
+        <p class="font-mono text-xs uppercase opacity-70">H1 — display</p>
         <h1>Heading nível 1</h1>
       </div>
       <div>
-        <p class="font-mono text-xs uppercase opacity-60">H2 — display</p>
+        <p class="font-mono text-xs uppercase opacity-70">H2 — display</p>
         <h2>Heading nível 2</h2>
       </div>
       <div>
-        <p class="font-mono text-xs uppercase opacity-60">H3 — display</p>
+        <p class="font-mono text-xs uppercase opacity-70">H3 — display</p>
         <h3>Heading nível 3</h3>
       </div>
       <div>
-        <p class="font-mono text-xs uppercase opacity-60">H4 — display</p>
+        <p class="font-mono text-xs uppercase opacity-70">H4 — display</p>
         <h4>Heading nível 4</h4>
       </div>
       <div>
-        <p class="font-mono text-xs uppercase opacity-60">H5 — display</p>
+        <p class="font-mono text-xs uppercase opacity-70">H5 — display</p>
         <h5>Heading nível 5</h5>
       </div>
       <div>
-        <p class="font-mono text-xs uppercase opacity-60">H6 — display</p>
+        <p class="font-mono text-xs uppercase opacity-70">H6 — display</p>
         <h6>Heading nível 6</h6>
       </div>
       <div class="border-brutal border-t-2 pt-4">
-        <p class="font-mono text-xs uppercase opacity-60">Body — sans</p>
+        <p class="font-mono text-xs uppercase opacity-70">Body — sans</p>
         <p class="text-base">
           O quick brown fox jumps over the lazy dog. 0123456789. Texto base do
           portfolio em Inter, 16px, leitura confortável em qualquer tamanho.
@@ -94,7 +95,7 @@ const shadows = [
       </button>
       <button
         type="button"
-        class="btn-brutal btn-brutal-hover bg-brutal-pink text-brutal-paper"
+        class="btn-brutal btn-brutal-hover bg-brutal-pink text-brutal-black"
       >
         Secundário
       </button>
@@ -157,11 +158,11 @@ const shadows = [
     <h2 id="borders" class="mb-6">Bordas</h2>
     <div class="grid grid-cols-2 gap-6 sm:grid-cols-3">
       <div class="border-brutal bg-brutal-paper p-6">
-        <p class="font-mono text-xs uppercase opacity-60">border-brutal</p>
+        <p class="font-mono text-xs uppercase opacity-70">border-brutal</p>
         <p>2px sólida preta</p>
       </div>
       <div class="border-brutal-thick bg-brutal-paper p-6">
-        <p class="font-mono text-xs uppercase opacity-60">
+        <p class="font-mono text-xs uppercase opacity-70">
           border-brutal-thick
         </p>
         <p>4px sólida preta</p>
@@ -170,7 +171,7 @@ const shadows = [
         class="border-brutal bg-brutal-lime p-6"
         style="border-color: var(--color-brutal-pink);"
       >
-        <p class="font-mono text-xs uppercase opacity-60">borda customizada</p>
+        <p class="font-mono text-xs uppercase opacity-70">borda customizada</p>
         <p>2px sólida pink</p>
       </div>
     </div>

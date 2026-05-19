@@ -45,3 +45,6 @@ coverage/
 .cache/
 .temp/
 .tmp/
+
+# lighthouse reports (geração local da auditoria de performance)
+.lh/
