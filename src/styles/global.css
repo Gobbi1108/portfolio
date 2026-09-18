@@ -25,6 +25,15 @@
   --color-brutal-blue: #1d4ed8;
   --color-brutal-lime: #b6ff3a;
 
+  /* Home nova (ROADMAP §3): campo de pontos sobre fundo quase preto.
+     `--color-grid-active` é a cor pedida para o ponto sob o ponteiro e também
+     o anel de foco dos hotspots — contra o fundo preto dá 3.55:1, acima do
+     mínimo de 3:1 que a WCAG pede para indicador não-textual.
+     Os dois valores são lidos em runtime pelo DotGrid via getComputedStyle,
+     então este bloco é a única definição das cores do grid. */
+  --color-grid-active: #007a33;
+  --color-grid-dot: #3a3f46;
+
   --font-display: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
@@ -175,100 +184,170 @@
   padding: 1.5rem;
 }
 
-/* Reveal de seção: fade + slide curto. Estado inicial só é aplicado quando
-   o documento marca `data-reveal-ready` no <html>, garantindo que clientes
-   sem JS (ou antes do bootstrap rodar) vejam o conteúdo normalmente. O
-   módulo `src/lib/sectionReveal.ts` adiciona a marca e cria ScrollTriggers
-   que ativam `is-revealed` no enter. Em prefers-reduced-motion, o módulo
-   já marca tudo como revelado e o bloco de fallback abaixo neutraliza a
-   transição mesmo se algo escapar. */
-html[data-reveal-ready] [data-reveal] {
-  opacity: 0;
-  transform: translateY(24px);
-  transition:
-    opacity 320ms ease-out,
-    transform 320ms ease-out;
-  will-change: opacity, transform;
+/* ===================================================================
+   Home: campo de pontos + hotspots invisíveis (ROADMAP.md §3)
+   =================================================================== */
+
+.home-stage {
+  position: relative;
+  height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--color-brutal-black);
+  /* Lado do quadrado do hotspot: 10% da MENOR dimensão do viewport, para o
+     alvo continuar quadrado em qualquer proporção de tela. */
+  --hotspot-size: min(10vw, 10vh);
 }
 
-html[data-reveal-ready] [data-reveal].is-revealed {
-  opacity: 1;
-  transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html[data-reveal-ready] [data-reveal] {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
-
-/* Skeleton brutalista: faixas diagonais chapadas com deslocamento por etapas
-   (sem fade suave). Usado como fallback de carregamento dentro de slots que
-   recebem ilhas pesadas (HeroCanvas via R3F, TimelineCharacter via lottie).
-   O slot recebe `data-state="loading"` no SSR e React troca para
-   `data-state="loaded"` quando o conteúdo está pronto, escondendo o overlay. */
-.brutal-skeleton {
+.dot-grid-canvas {
   position: absolute;
   inset: 0;
-  background-color: var(--color-brutal-bone);
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--color-brutal-black) 0,
-    var(--color-brutal-black) 2px,
-    var(--color-brutal-bone) 2px,
-    var(--color-brutal-bone) 12px
-  );
+  width: 100%;
+  height: 100%;
+  /* O canvas não intercepta ponteiro: os hotspots por cima seguem clicáveis e
+     o grid continua reagindo embaixo deles. */
   pointer-events: none;
-  animation: brutal-skeleton-shift 900ms steps(6) infinite;
 }
 
-@keyframes brutal-skeleton-shift {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 24px 0;
-  }
+/* Hotspot: alvo invisível ao mouse. Quem revela é o cursor (.cursor-orb) —
+   e, no teclado, o :focus-visible abaixo. */
+.hotspot {
+  position: absolute;
+  width: var(--hotspot-size);
+  height: var(--hotspot-size);
+  display: grid;
+  place-items: center;
+  border: 2px solid transparent;
+  outline-offset: -2px;
 }
 
-[data-state="loaded"] > .brutal-skeleton {
-  display: none;
+.hotspot[data-anchor="top-left"] {
+  top: 0;
+  left: 0;
+}
+.hotspot[data-anchor="top-right"] {
+  top: 0;
+  right: 0;
+}
+.hotspot[data-anchor="bottom-left"] {
+  bottom: 0;
+  left: 0;
+}
+.hotspot[data-anchor="bottom-right"] {
+  bottom: 0;
+  right: 0;
+}
+.hotspot[data-anchor="center"] {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .brutal-skeleton {
-    animation: none;
-  }
+/* Teclado não tem hover, então o foco precisa mostrar onde o alvo está —
+   caso contrário a navegação por Tab acontece às cegas (CLAUDE.md §7). */
+.hotspot:focus-visible {
+  outline: 3px solid var(--color-grid-active);
+  border-color: var(--color-grid-active);
+  background-color: color-mix(in srgb, var(--color-grid-active) 16%, transparent);
 }
 
-/* Cursor customizado opcional no Hero. O bloco `[data-hero-cursor]` recebe
-   `cursor: none` apenas quando JS confirma que pointer fino + motion ok; ver
-   `src/components/HeroCursor.tsx`. !important justificado: filhos do hero
-   (botão CTA com `cursor: pointer`) precisam ceder ao cursor custom sem
-   reescrever cada utilitária. */
-[data-hero-cursor].hero-cursor-active,
-[data-hero-cursor].hero-cursor-active * {
+.hotspot-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.hotspot:focus-visible .hotspot-label {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  padding: 0.25rem 0.5rem;
+  max-width: calc(var(--hotspot-size) * 2);
+  white-space: normal;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  /* Branco sobre preto: 19:1. O rótulo só existe no foco, mas é texto real e
+     precisa passar AA como qualquer outro. */
+  color: var(--color-brutal-paper);
+  background-color: var(--color-brutal-black);
+}
+
+/* Cursor da home: bola branca de 12px, borda de 2px SEMPRE visível.
+   `!important` justificado: <a> herda `cursor: pointer` do user agent e
+   qualquer filho pode trazer a sua própria, e todas precisam ceder ao cursor
+   custom sem reescrever cada elemento. */
+:root.cursor-orb-active,
+:root.cursor-orb-active * {
   cursor: none !important;
 }
 
-.hero-cursor {
+.cursor-orb {
   position: fixed;
   top: 0;
   left: 0;
-  width: 28px;
-  height: 28px;
-  margin: -14px 0 0 -14px;
-  background-color: var(--color-brutal-pink);
-  border: var(--border-brutal-width) solid var(--color-brutal-black);
-  box-shadow: var(--shadow-brutal-sm);
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: 2px solid var(--color-brutal-paper);
+  border-radius: 9999px;
   pointer-events: none;
   z-index: 60;
   opacity: 0;
   transition: opacity 120ms linear;
 }
 
-.hero-cursor[data-visible="true"] {
+.cursor-orb[data-visible="true"] {
   opacity: 1;
+}
+
+.cursor-orb-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: var(--color-brutal-paper);
+  /* 1.5s é a spec, e a volta usa a mesma curva: sair do hotspot sem clicar
+     devolve o preenchimento no mesmo tempo (ROADMAP §3.2). */
+  transition: opacity 1500ms linear;
+}
+
+.cursor-orb[data-over="true"] .cursor-orb-fill {
+  opacity: 0;
+}
+
+/* ===================================================================
+   Placeholder mobile temporário (ROADMAP.md §4) — sai no M5
+   =================================================================== */
+
+.mobile-gate {
+  display: none;
+}
+
+@media (max-width: 767px), (pointer: coarse) and (max-width: 1023px) {
+  .mobile-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding-inline: 1rem;
+    background-color: #ffffff;
+    color: #000000;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 9vw, 3.5rem);
+    letter-spacing: 0.12em;
+  }
+
+  body > *:not(.mobile-gate) {
+    display: none;
+  }
 }
