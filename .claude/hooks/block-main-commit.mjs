@@ -25,8 +25,12 @@ try {
   process.exit(0); // payload ilegível não é motivo para travar o agente
 }
 
+// Exige que um segmento do comando COMECE com git: `echo "git commit"` ou um
+// grep por essa string não são commits, e barrar isso trava trabalho legítimo.
+const IS_GIT_COMMIT = /(^|[|;&]|\bthen\b|\bdo\b)\s*git\s+(-C\s+\S+\s+)?(-c\s+\S+\s+)*commit\b/;
+
 const command = input?.tool_input?.command ?? "";
-if (!/\bgit\b[^|;&]*\bcommit\b/.test(command)) process.exit(0);
+if (!IS_GIT_COMMIT.test(command)) process.exit(0);
 
 let branch = "";
 try {
