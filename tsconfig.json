@@ -4,8 +4,11 @@
     ".astro/types.d.ts",
     "**/*"
   ],
+  // *.check.ts roda no Node (npm run check:*), não no browser nem no build.
+  // Fora do astro check para não exigir @types/node só por causa de um assert.
   "exclude": [
-    "dist"
+    "dist",
+    "src/**/*.check.ts"
   ],
   "compilerOptions": {
     "jsx": "react-jsx",

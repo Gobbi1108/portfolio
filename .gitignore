@@ -48,3 +48,6 @@ coverage/
 
 # lighthouse reports (geração local da auditoria de performance)
 .lh/
+
+# Lock de sessão do Claude Code — local, não versionar
+.claude/scheduled_tasks.lock

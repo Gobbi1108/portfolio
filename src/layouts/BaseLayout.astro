@@ -5,12 +5,15 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  /** Sem header, footer nem gutter: a página ocupa a viewport inteira (home). */
+  bare?: boolean;
 }
 
 const {
   title = "Portfolio",
   description = "Portfolio neubrutalista de Gabriel Gobbi — desenvolvedor e designer. Interfaces com tipografia forte, cores chapadas e sombras hard.",
   image = "/og.png",
+  bare = false,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -53,6 +56,15 @@ const ogImage = new URL(image, Astro.site).toString();
       Pular para conteúdo
     </a>
 
+    {/* Placeholder mobile temporário (ROADMAP §4): CSS puro esconde o resto do
+        body e mostra só isto em telas pequenas. Sai no M5, junto do modelo
+        mobile de verdade.
+        ponytail: gate por media query esconde o conteúdo do crawler mobile —
+        aceitável enquanto o site não é divulgado; se precisar indexar antes do
+        M5, trocar por rota /mobile com redirect. */}
+    <div class="mobile-gate">MOBILE</div>
+
+    {!bare && (
     <header
       class="border-brutal border-b-4 bg-brutal-paper sticky top-0 z-40"
     >
@@ -74,11 +86,13 @@ const ogImage = new URL(image, Astro.site).toString();
         </nav>
       </div>
     </header>
+    )}
 
-    <main id="main" class="mx-auto max-w-6xl px-6 py-12">
+    <main id="main" class={bare ? "" : "mx-auto max-w-6xl px-6 py-12"}>
       <slot />
     </main>
 
+    {!bare && (
     <footer
       class="border-brutal border-t-4 bg-brutal-black text-brutal-paper mt-24"
     >
@@ -91,10 +105,7 @@ const ogImage = new URL(image, Astro.site).toString();
         <p class="text-sm opacity-70">Construído com Astro + Tailwind v4.</p>
       </div>
     </footer>
+    )}
 
-    <script>
-      import { initSectionReveal } from "../lib/sectionReveal";
-      initSectionReveal();
-    </script>
   </body>
 </html>

@@ -15,6 +15,9 @@ module.exports = [
       'build/**',
       '.vercel/**',
       '.netlify/**',
+      // Scripts de harness rodam no Node, não no browser; a config abaixo é
+      // toda browser-globals e acusaria `process`/`console` como undefined.
+      '.claude/**',
     ],
   },
 

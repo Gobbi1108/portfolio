@@ -1,0 +1,37 @@
+---
+// Destino provisório dos 5 hotspots enquanto o conteúdo não existe.
+//
+// ponytail: tela estática. O M3 do ROADMAP troca este bloco pela morph-gallery
+// (WebGL) com as imagens auto-hospedadas; até lá isto evita link morto sem
+// carregar shader nenhum.
+interface Props {
+  /** Qual seção o visitante encontrou. */
+  section: string;
+}
+
+const { section } = Astro.props;
+---
+
+<section
+  class="grid min-h-[100dvh] place-items-center bg-brutal-black px-6 text-center"
+>
+  <div>
+    <p
+      class="font-sans text-xs uppercase tracking-[0.3em] text-brutal-paper/80"
+    >
+      {section}
+    </p>
+    <h1
+      class="mt-4 font-display uppercase tracking-[0.12em] text-brutal-paper"
+      style="font-size: clamp(2rem, 8vw, 5rem)"
+    >
+      in construction
+    </h1>
+    <a
+      href="/"
+      class="mt-10 inline-flex items-center gap-2 border-2 border-brutal-paper px-5 py-3 font-display text-sm uppercase tracking-[0.1em] text-brutal-paper transition-colors hover:bg-brutal-paper hover:text-brutal-black focus-visible:bg-brutal-paper focus-visible:text-brutal-black"
+    >
+      Voltar
+    </a>
+  </div>
+</section>
