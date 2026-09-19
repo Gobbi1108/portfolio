@@ -3,7 +3,7 @@
 Planejamento de longo prazo: marcos, escopo e decisões que o código de **hoje** já tem que
 respeitar. Estado do agora fica em `STATE.md`. Regras de codificação em `CLAUDE.md`.
 
-Última revisão: **2026-09-17**.
+Última revisão: **2026-09-19**.
 
 ---
 
@@ -123,18 +123,19 @@ não entender o que é o site em 3 segundos, a graça do desktop não compensa.
 
 ## 5. Telas de destino (provisórias)
 
-### 5.1 "In construction" — destino dos 5 hotspots hoje
+### 5.1 "In construction" — destino dos 5 hotspots hoje ✅ feito em 2026-09-19
 
-Base: `morph-gallery.tsx` (21st.dev). Ponto a favor: WebGL cru, **zero dependência nova**, já
-tem fallback DOM e cleanup. Entra em `src/components/ui/morph-gallery.tsx`.
+Entregue em `src/lib/morphGallery.ts` + `src/components/UnderConstruction.astro`. O que ficou
+valendo (a spec original previa uma ilha React vinda do 21st.dev; ver `STATE.md` §0):
 
-- Texto **estático** "in construction" centralizado, sobreposto à galeria.
-- A cor do texto tem que se destacar da paisagem que está passando. Solução padrão:
-  `mix-blend-mode: difference` ou pastilha de fundo chapada, decidida **por medição de
-  contraste AA**, não por gosto (`CLAUDE.md` §7).
-- Imagens: **auto-hospedadas** em `src/assets/` (as URLs do demo são CDN de terceiro; o
-  shader exige CORS e nós não dependemos de CDN alheio).
-- `autoplay` respeita `prefers-reduced-motion` e `document.hidden` (o componente já faz).
+- 3 fotos do Gabriel em `src/assets/gallery/`, em loop: **pôr do sol → floresta → praia**.
+- **WebGL cru em TS puro**, sem React e sem GSAP — 2.1KB de JS na rota.
+- Texto estático "in construction" numa **pastilha preta chapada**: o texto nunca encosta na
+  foto, então o contraste é fixo em 19:1 e não depende de qual frame está na tela.
+- A primeira foto também é um `<img>` estático por baixo do canvas. Ele é o fallback de
+  WebGL ausente, de falha de rede, de contexto perdido e de `prefers-reduced-motion` — nesse
+  último o canvas nem monta.
+- RAF pausa em `document.hidden` e devolve o tempo parado ao relógio ao voltar.
 
 ### 5.2 Erro / 404 — qualquer falha cai aqui
 
@@ -160,7 +161,7 @@ Workshops / Programs / Inquiries"). Entra em `src/components/ui/error-hero.tsx` 
 | **M0** | Harness | `CLAUDE.md`, `STATE.md`, `ROADMAP.md` | os três existem e são lidos no início de cada tarefa grande |
 | **M1** ✅ | Fim da v1 | Hero/Timeline/Contact + deps de 3D e Lottie | **apagada em 2026-09-18**; recuperável no histórico (`f0cabe6`) |
 | **M2** ✅ | Home nova | dot grid + cursor + 5 hotspots + `hotspots.ts` + nav acessível + **placeholder `MOBILE`** (§4) | **feito em 2026-09-18** — medições em `STATE.md` §0 |
-| **M3** | Tela in construction | `morph-gallery` portada, assets locais, texto AA | as 5 rotas caem nela — hoje elas existem como tela estática (`UnderConstruction.astro`) |
+| **M3** ✅ | Tela in construction | galeria WebGL + 3 fotos locais + pastilha AA | **feito em 2026-09-19** — medições em `STATE.md` §0 |
 | **M4** | Tela de erro | `error-hero` portada + `404.astro` | 404 e erro de cliente caem nela |
 | **M5** | Mobile real | placeholder sai, modelo (a)/(b)/(c) do §4 escolhido e implementado | `pointer: coarse` tem experiência própria completa |
 | **M6** | Conteúdo real | `/portfolio` primeiro, depois `/jogos` e `/roadmap` | cada rota substitui a tela provisória |
@@ -175,10 +176,12 @@ Ordem é dependência real: M2 antes de M3/M4 (sem home não há navegação), M
 - **Paleta sem dono.** Os tokens `--color-brutal-*` sobreviveram à v1 porque a home e as telas
   provisórias usam preto, paper e as fontes. Quando a identidade visual nova fechar, decidir:
   renomear os tokens ou trocá-los — e aí `styleguide.astro` acompanha.
-- **`hotspots.check.ts` é o único teste.** A máquina de estado do cursor ainda não tem check
-  runnable; é a segunda coisa que quebra em silêncio (`CLAUDE.md` §2).
-- **`react`, `@astrojs/react` e `gsap` instalados sem consumidor**, reservados para M3 e M4.
-  Se esses marcos mudarem de rumo, desinstalar em vez de arrastar.
+- **Dois checks runnable:** `hotspots.check.ts` e `morphGallery.check.ts`. A máquina de
+  estado do cursor segue sem um — e não dá para escrever enquanto `cursorOrb.ts` se
+  auto-inicializar no import, porque o módulo não sobe no Node (`STATE.md` §8.5).
+- **`react`, `@astrojs/react` e `gsap` instalados sem consumidor.** O M3 fechou sem React,
+  então só o M4 ainda poderia justificar `gsap` — React não tem mais marco nenhum a favor, e
+  a integração ainda emite ~193KB mortos em `dist/`. Auditoria completa em `STATE.md` §8.
 - **Sem deploy automatizado** (FTP manual). Só automatizar se a frequência de publicação doer.
 - **View Transitions do Astro** não estão em uso. Se entrarem, revisar cleanup de toda ilha
   (cursor e WebGL vazam entre navegações client-side).

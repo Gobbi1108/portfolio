@@ -325,6 +325,65 @@
 }
 
 /* ===================================================================
+   Tela "in construction": galeria em morph (ROADMAP.md §5.1)
+   =================================================================== */
+
+.gallery-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  overflow: hidden;
+  /* Fundo enquanto a primeira foto não decodificou: preto chapado, nunca o
+     paper do body — a pastilha branca sobre paper piscaria no carregamento. */
+  background-color: var(--color-brutal-black);
+}
+
+/* Foto estática e canvas ocupam exatamente a mesma caixa: o canvas só entra por
+   cima quando a primeira textura está desenhada, então não há salto. */
+.gallery-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-canvas {
+  opacity: 0;
+  transition: opacity 600ms linear;
+}
+
+.gallery-canvas[data-ready="true"] {
+  opacity: 1;
+}
+
+/* Pastilha chapada em vez de texto direto sobre a paisagem: o contraste passa a
+   ser paper sobre black (19:1) em qualquer frame da galeria, sem depender de
+   medir pixel de imagem em movimento (ROADMAP §5.1, CLAUDE.md §7). */
+.gallery-plate {
+  position: relative;
+  z-index: 1;
+  /* Largura definida, não `max-width`: `container-type` corta a contribuição do
+     conteúdo para o tamanho, então uma caixa dimensionada pelo texto colapsaria
+     para a largura do padding. */
+  container-type: inline-size;
+  width: min(46rem, calc(100% - 3rem));
+  padding: clamp(1.5rem, 5vw, 3rem);
+  text-align: center;
+  background-color: var(--color-brutal-black);
+  border: var(--border-brutal-width) solid var(--color-brutal-paper);
+  box-shadow: var(--shadow-brutal-lg);
+}
+
+/* Medido em `cqw` (largura da pastilha), não em `vw`: com `8vw` o título
+   estourava a caixa preta em telas largas e a linha "CONSTRUCTION" saía por
+   cima da foto, que é exatamente o que a pastilha existe para evitar. */
+.gallery-title {
+  font-size: clamp(1.5rem, 9cqw, 3.5rem);
+}
+
+/* ===================================================================
    Placeholder mobile temporário (ROADMAP.md §4) — sai no M5
    =================================================================== */
 

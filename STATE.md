@@ -3,15 +3,68 @@
 Memória de curto/médio prazo do agente. **Arquivo mutável:** atualizar ao fim de toda tarefa
 grande. Se algo aqui contradiz o código, o código ganha — e esta linha vira correção.
 
-- **Data da última atualização:** 2026-09-18
-- **Branch:** `feat/home-hotspots` → merge na `main`
-- **Fase:** **M1 e M2 entregues.** M3/M4 abertos.
+- **Data da última atualização:** 2026-09-19
+- **Branch:** `feat/morph-gallery` → merge na `main`
+- **Fase:** **M1, M2 e M3 entregues.** M4/M5 abertos.
 - **Rotina de git agora é enforçada por hook** (`.claude/hooks/block-main-commit.mjs`):
   `git commit` com a `main` em HEAD é recusado. Ciclo completo em `CLAUDE.md` §9.
 
 ---
 
-## 0. Home nova — entregue em 2026-09-18
+## 0. Galeria "in construction" — entregue em 2026-09-19 (M3)
+
+As 5 rotas provisórias deixaram de ser tela preta chapada: agora rodam 3 fotos do Gabriel
+em loop, com morph em WebGL, e o recado fica numa pastilha preta por cima.
+
+**Arquivos novos**
+
+```
+src/assets/gallery/{por-do-sol,floresta,praia}.jpg   fotos do Gabriel (originais)
+src/lib/morphGallery.ts          WebGL cru + RAF, sem React e sem GSAP
+src/lib/morphGallery.check.ts    check runnable — npm run check:gallery
+```
+
+**Modificados:** `src/components/UnderConstruction.astro` (virou a galeria),
+`src/styles/global.css` (bloco `.gallery-*`), `package.json`, `README.md`.
+
+**Decisões tomadas com o Gabriel em 2026-09-19 (registrar, não re-discutir):**
+
+1. **Galeria única nas 5 rotas**, não uma foto por rota. Ordem do morph:
+   **pôr do sol → floresta → praia**. A primeira também é a foto estática de fallback.
+2. **TS puro + WebGL, sem ilha React** — mesma lógica do dot grid: o `morph-gallery` do
+   21st.dev só usava `useEffect` para montar o contexto, e o runtime do React custaria
+   ~186KB nas 5 rotas para animar um crossfade.
+3. **Contraste por pastilha chapada**, não por `mix-blend-mode`: o texto nunca encosta na
+   foto, então o contraste é paper sobre black (19:1) em qualquer frame — AA sem depender
+   de medir pixel de imagem em movimento.
+4. As fotos são **do Gabriel**, então a pendência de "auto-hospedar asset de CDN alheia"
+   morreu para o M3 (segue valendo para o M4).
+
+**Verificado no navegador (Chrome headless por CDP), não só no build:**
+
+| O quê | Resultado |
+|---|---|
+| `typecheck` / `lint` / `build` / `check:hotspots` / `check:gallery` | os cinco passam |
+| Ciclo do morph em `/jogos` | pôr do sol (t=1.8s) → floresta (t=5s) → praia (t=11s) ✓ |
+| `cover` nas 3 proporções (4:3, 3:4 e 4:3) | preenche sem deformar e sem tarja ✓ |
+| `prefers-reduced-motion: reduce` | canvas não monta (`data-ready` ausente), foto estática fica ✓ |
+| LCP de `/jogos` | **16ms** (elemento `H1`) — a pendência de "performance 0" acabou nessas rotas |
+| JS da rota | **2.1KB** transferidos, 1 arquivo |
+| Imagens da rota | 405KB nos 3 webp (2892KB+1420KB+358KB de origem) |
+
+**Bug achado e corrigido na verificação:** o `font-size: clamp(2rem, 8vw, 5rem)` do título
+estourava a pastilha em telas largas — a linha "CONSTRUCTION" saía por cima da foto, que é
+justamente o que a pastilha evita. Virou `9cqw` sobre a pastilha (`.gallery-title`). O
+`container-type: inline-size` obrigou a pastilha a ter `width` definida: com `max-width`, a
+containment corta a contribuição do conteúdo e a caixa colapsa para a largura do padding.
+
+**Limitação do harness (não é bug do código):** `chrome --headless --screenshot` não executa
+`requestAnimationFrame` nenhum, nem com `--virtual-time-budget`. Animação só se verifica por
+CDP com espera real — medido com um driver de ~40 linhas no scratchpad.
+
+---
+
+## 0.0. Home nova — entregue em 2026-09-18
 
 Funciona ponta a ponta: campo de pontos, cursor de bola branca, 5 hotspots invisíveis,
 placeholder mobile e 5 rotas de destino.
@@ -143,14 +196,22 @@ Nenhum bug conhecido (comportamentos medidos em §0). Pendências reais:
 - **Lighthouse não pontua performance da home** (`performance 0`, LCP `null`): a página só tem
   canvas e texto `sr-only`, e canvas não é candidato a LCP. Não é lentidão — são 56KB no total —,
   mas toda auditoria vai reportar zero até existir conteúdo com texto ou imagem. Não inventar
-  conteúdo para agradar a ferramenta.
+  conteúdo para agradar a ferramenta. **Vale só para `/`**: as 5 rotas da galeria têm LCP de
+  16ms medido desde o M3.
+- **`floresta.jpg` é a foto fraca do conjunto: 683×911**, contra 4032×3024 e 4608×3456 das
+  outras duas. Em tela cheia ela fica visivelmente mais mole, e o webp dela pesa 242KB (mais
+  que as outras duas somadas) porque folhagem é textura densa. Se o Gabriel tiver o original
+  em resolução cheia, trocar o arquivo resolve sem tocar em código.
 - **Mobile gate esconde o conteúdo do crawler mobile** enquanto durar (comentado no código).
-- **`react`, `@astrojs/react` e `gsap` estão instalados sem nenhum import.** Reservados para
-  M3 e M4. Se esses marcos mudarem de rumo, desinstalar.
-- **Contraste do texto "in construction"** sobre a galeria em movimento: medir quando o M3
-  trocar a tela estática pelo shader. Hoje é texto claro sobre preto chapado, AA folgado.
-- **Assets de terceiro:** galeria do M3 e hero de erro do M4 apontam para CDNs alheias —
-  auto-hospedar (o shader exige CORS).
+- **`react`, `react-dom`, `@astrojs/react`, `@types/react*` e `gsap` seguem sem nenhum
+  import — e agora sem marco que os justifique.** O M3 fechou sem React, pelo mesmo motivo
+  que a home fechou: não há state nem JSX. Pior: a integração faz o build emitir
+  `dist/_astro/client.*.js` (~193KB) que **nenhuma página referencia** — peso morto que sobe
+  por FTP. Só o M4 poderia usar `gsap`. Ver a auditoria de 2026-09-19 no §8.
+- **Contraste do texto "in construction":** resolvido por pastilha chapada (paper sobre
+  black, 19:1), independente do frame da galeria.
+- **Assets de terceiro:** resolvido no M3 (as fotos são do Gabriel). Segue aberto para o M4 —
+  o vídeo do `prisma-hero` continua em CDN alheia.
 - **`styleguide.astro` documenta a paleta da v1.** Segue válido porque os tokens continuam em
   uso, mas é a próxima coisa a revisar quando a direção visual nova fechar.
 
@@ -158,12 +219,11 @@ Nenhum bug conhecido (comportamentos medidos em §0). Pendências reais:
 
 ## 5. Atacar em seguida (ordem)
 
-1. **M3** — `morph-gallery` portada + imagens auto-hospedadas, substituindo o conteúdo de
-   `UnderConstruction.astro`.
-2. **M4** — `error-hero` portada para GSAP + SVG inline, `404.astro` e `.htaccess` com
+1. **M4** — `error-hero` portada para GSAP + SVG inline, `404.astro` e `.htaccess` com
    `ErrorDocument /404.html`.
-3. **M5** — modelo mobile de verdade (escolher (a), (b) ou (c) do `ROADMAP.md` §4) e remover
+2. **M5** — modelo mobile de verdade (escolher (a), (b) ou (c) do `ROADMAP.md` §4) e remover
    o placeholder.
+3. **Limpeza pendente do §8** — decidir o que cai (React, `/styleguide`, rota dinâmica).
 4. Perguntas de **conteúdo** ainda abertas: o que são TR e BR, formato do `/roadmap`, se
    `#007A33` é cor do sistema ou só do grid.
 
@@ -171,15 +231,18 @@ Nenhum bug conhecido (comportamentos medidos em §0). Pendências reais:
 
 ## 6. Arquivos que a próxima sessão vai tocar
 
-Novos: `src/components/ui/morph-gallery.*`, `src/components/ui/error-hero.*`,
-`src/pages/404.astro`, `public/.htaccess`, imagens em `src/assets/`.
+Novos: `src/lib/errorHero.ts`, `src/pages/404.astro`, `public/.htaccess`.
 
-Modificados: `src/components/UnderConstruction.astro` (vira casca da galeria) e
-`src/styles/global.css`.
+Modificados: `src/styles/global.css` e, se a limpeza do §8 for aprovada, `package.json`,
+`astro.config.mjs`, `tsconfig.json`, `src/layouts/BaseLayout.astro` e as 5 rotas.
 
 ---
 
 ## 7. Histórico de sessões (mais recente primeiro)
+
+- **2026-09-19** — M3 na branch `feat/morph-gallery`: as 3 fotos do Gabriel entraram em
+  `src/assets/gallery/` e a tela "in construction" virou galeria em morph WebGL sem React
+  (§0). Junto, a auditoria de clean code do §8.
 
 - **2026-09-18** — M2 e M1 na branch `feat/home-hotspots`: dot grid, cursor de bola,
   5 hotspots, placeholder mobile, 5 rotas provisórias (3KB de JS na home, medido no
@@ -195,3 +258,62 @@ Modificados: `src/components/UnderConstruction.astro` (vira casca da galeria) e
   estático, elemento 3D, personagem Lottie na timeline, scroll-driven frames + navegação por
   setas, transições de cenário, card de contato, micro-interações, auditoria final de
   SEO/a11y/performance.
+
+---
+
+## 8. Auditoria de clean code — 2026-09-19 (nada aplicado, esperando decisão)
+
+Varredura do repo inteiro pedida pelo Gabriel junto do M3. Ordenado por peso, não por
+esforço. **Nenhum item foi aplicado nesta sessão** — todos mudam escopo ou apagam trabalho
+anterior, e essa decisão é dele.
+
+### 8.1 React instalado sem nenhum consumidor — e emitindo 193KB mortos
+
+`react`, `react-dom`, `@astrojs/react`, `@types/react`, `@types/react-dom` não são
+importados por arquivo nenhum. A integração ainda assim faz o build emitir
+`dist/_astro/client.*.js` (193KB) que **nenhum HTML referencia** — medido por
+`grep -rl client. dist/*/index.html` → zero. É peso morto no FTP, não no browser.
+
+Removendo a integração saem também `jsx`/`jsxImportSource` do `tsconfig.json` e a pasta
+`src/components/ui/` do `CLAUDE.md` §10 perde sentido. O M4 (`error-hero`) é o último marco
+que poderia trazer React de volta — e o M2 e o M3 já fecharam sem ele.
+
+### 8.2 `/styleguide` é o único consumidor de metade do design system
+
+`brutal-lime`, `brutal-bone`, `brutal-yellow`, `brutal-pink`, `brutal-blue`,
+`border-brutal-thick`, `card-brutal`, `btn-brutal-hover` **só aparecem em
+`src/pages/styleguide.astro`**. É também a única rota sem `bare`, ou seja, a única razão de
+o `BaseLayout` ainda ter header, footer e `brutal-link`.
+
+Apagar `/styleguide` derruba em cadeia ~8 tokens, 4 utilitárias, o header, o footer e o
+ramo `!bare` do layout. Não é uma decisão de código: é decidir se o catálogo da paleta da v1
+ainda serve para alguma coisa.
+
+### 8.3 Tokens sem uso algum
+
+`--shadow-brutal-sm-inv`, `-md-inv`, `-lg-inv`, `-xl-inv` e `--radius-brutal`: zero
+ocorrências fora da própria definição, inclusive no styleguide. Deleção sem consequência.
+
+### 8.4 As 5 rotas são o mesmo arquivo cinco vezes
+
+`jogos`, `lab-a`, `lab-b`, `portfolio` e `roadmap` são 8 linhas idênticas variando título,
+description e `section`. Pior que a duplicação: os rótulos vivem **duas vezes** — em
+`hotspots.ts` (que o `ROADMAP` §1.3 declara fonte única da verdade) e de novo em cada página,
+já divergindo ("Laboratório A — ideia em construção" no mapa, "Laboratório A" na rota).
+
+Uma rota `[section].astro` com `getStaticPaths` alimentado por `HOTSPOTS` mata a divergência.
+Só vale enquanto as 5 forem iguais — na hora que uma ganhar conteúdo próprio, ela sai da
+rota dinâmica e vira arquivo de novo.
+
+### 8.5 `dotGrid.ts` e `cursorOrb.ts` se auto-inicializam no import
+
+Os dois terminam com `document.querySelector(...)` no topo do módulo. Isso os torna
+impossíveis de importar no Node — que é exatamente o motivo de não existir check runnable da
+máquina de estado do cursor (débito já registrado no `ROADMAP` §7). `morphGallery.ts` usa o
+padrão oposto (exporta `initMorphGallery`, quem chama é o componente) e por isso ganhou
+check. Alinhar os dois custa ~3 linhas cada.
+
+### 8.6 Fotos originais no git
+
+`src/assets/gallery/` carrega 4.4MB de JPG dos quais o build usa no máximo o lado de 1600px.
+Manter o original é defensável (é a fonte), mas são 4.4MB permanentes no histórico.

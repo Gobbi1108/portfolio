@@ -1,30 +1,62 @@
 ---
-// Destino provisório dos 5 hotspots enquanto o conteúdo não existe.
-//
-// ponytail: tela estática. O M3 do ROADMAP troca este bloco pela morph-gallery
-// (WebGL) com as imagens auto-hospedadas; até lá isto evita link morto sem
-// carregar shader nenhum.
+// Destino provisório dos 5 hotspots enquanto o conteúdo não existe
+// (ROADMAP.md §5.1): galeria em morph por baixo, recado por cima.
+import type { ImageMetadata } from "astro";
+import { Image, getImage } from "astro:assets";
+import porDoSol from "../assets/gallery/por-do-sol.jpg";
+import floresta from "../assets/gallery/floresta.jpg";
+import praia from "../assets/gallery/praia.jpg";
+
 interface Props {
   /** Qual seção o visitante encontrou. */
   section: string;
 }
 
 const { section } = Astro.props;
+
+// Ordem do morph, definida em 2026-09-19. A primeira também é a foto estática
+// que fica por baixo do canvas — fallback de WebGL, de reduced motion e
+// candidata a LCP da rota.
+const GALLERY = [porDoSol, floresta, praia];
+
+// Lado maior em 1600px: acima disso o shader não ganha nitidez e o arquivo
+// dobra. `Math.min` evita upscale — a foto da floresta é menor que o teto.
+const sizeOf = (image: ImageMetadata) =>
+  image.height > image.width
+    ? { height: Math.min(1600, image.height) }
+    : { width: Math.min(1600, image.width) };
+
+const FORMAT = { format: "webp", quality: 70 } as const;
+
+const frames = await Promise.all(
+  GALLERY.map((image) => getImage({ src: image, ...FORMAT, ...sizeOf(image) })),
+);
 ---
 
-<section
-  class="grid min-h-[100dvh] place-items-center bg-brutal-black px-6 text-center"
->
-  <div>
-    <p
-      class="font-sans text-xs uppercase tracking-[0.3em] text-brutal-paper/80"
-    >
+<section class="gallery-stage">
+  {/* Decorativa: a paisagem é pano de fundo e quem carrega o significado é o
+      texto por cima, então `alt=""` em vez de descrição inventada. */}
+  <Image
+    src={GALLERY[0]}
+    alt=""
+    {...FORMAT}
+    {...sizeOf(GALLERY[0])}
+    loading="eager"
+    fetchpriority="high"
+    class="gallery-frame"
+  />
+
+  <canvas
+    class="gallery-frame gallery-canvas"
+    data-morph-gallery
+    data-frames={JSON.stringify(frames.map((frame) => frame.src))}
+    aria-hidden="true"></canvas>
+
+  <div class="gallery-plate">
+    <p class="font-sans text-xs uppercase tracking-[0.3em] text-brutal-paper/80">
       {section}
     </p>
-    <h1
-      class="mt-4 font-display uppercase tracking-[0.12em] text-brutal-paper"
-      style="font-size: clamp(2rem, 8vw, 5rem)"
-    >
+    <h1 class="gallery-title mt-4 font-display uppercase tracking-[0.12em] text-brutal-paper">
       in construction
     </h1>
     <a
@@ -35,3 +67,10 @@ const { section } = Astro.props;
     </a>
   </div>
 </section>
+
+<script>
+  import { initMorphGallery } from "../lib/morphGallery";
+
+  const canvas = document.querySelector<HTMLCanvasElement>("[data-morph-gallery]");
+  if (canvas) initMorphGallery(canvas);
+</script>
