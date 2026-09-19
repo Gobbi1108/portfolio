@@ -28,6 +28,12 @@ interface Dot {
 const GAP = 32; // distância entre centros, px CSS
 const DOT_SIZE = 4;
 const PROXIMITY = 140; // raio de influência do ponteiro na cor
+const PUSH_RADIUS = 160; // raio do empurrão que o ponteiro dá ao passar
+// Velocidade injetada por px percorrido pelo ponteiro. O empurrão é medido em
+// distância, não em taxa de eventos: mouse de 1000Hz e de 60Hz produzem o mesmo
+// resultado no mesmo gesto.
+const PUSH_PER_PX = 0.09;
+const MAX_TRAVEL = 40; // px por evento — um salto maior que isso é teletransporte
 const SHOCK_RADIUS = 240;
 const SHOCK_STRENGTH = 16;
 
@@ -72,6 +78,8 @@ export function initDotGrid(canvas: HTMLCanvasElement): void {
   let rect = canvas.getBoundingClientRect();
   let pointerX = Number.NEGATIVE_INFINITY;
   let pointerY = Number.NEGATIVE_INFINITY;
+  // Última posição do ponteiro, para medir quanto ele andou entre dois eventos.
+  let last: { x: number; y: number } | null = null;
   let moved = false;
   let raf = 0;
   let awake = false;
@@ -161,9 +169,44 @@ export function initDotGrid(canvas: HTMLCanvasElement): void {
     raf = requestAnimationFrame(frame);
   };
 
+  /**
+   * Afasta de (cx, cy) os pontos dentro do raio. `strength` é a velocidade
+   * máxima injetada, em px por frame — a mola cuida da volta.
+   *
+   * Mesmo empurrão para o movimento e para o clique: o que muda entre os dois
+   * é só raio e força. Duas físicas diferentes para o mesmo gesto é o tipo de
+   * divergência que só aparece quando uma delas quebra.
+   */
+  const push = (cx: number, cy: number, radius: number, strength: number) => {
+    for (const dot of dots) {
+      const dx = dot.x + dot.ox - cx;
+      const dy = dot.y + dot.oy - cy;
+      // Caixa antes do círculo: `pointermove` dispara até 120x/s e a raiz
+      // quadrada em ~1200 pontos por evento é trabalho que ninguém vê.
+      if (dx > radius || dx < -radius || dy > radius || dy < -radius) continue;
+      const dist = Math.hypot(dx, dy);
+      if (dist > radius) continue;
+      // Divisor evita explodir o ponto exatamente sob o ponteiro (dist ~ 0).
+      const force = (strength * (1 - dist / radius)) / Math.max(dist, 8);
+      dot.vx += dx * force;
+      dot.vy += dy * force;
+    }
+    moved = true;
+    wake();
+  };
+
   const onPointerMove = (e: PointerEvent) => {
-    pointerX = e.clientX - rect.left;
-    pointerY = e.clientY - rect.top;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const travel = last ? Math.hypot(x - last.x, y - last.y) : 0;
+    last = { x, y };
+    pointerX = x;
+    pointerY = y;
+
+    // Passar o cursor tem que mexer no campo, não só recolorir: é o empurrão
+    // por inércia do dot grid original. Sem ele, só o clique dava sinal de vida.
+    if (travel > 0) push(x, y, PUSH_RADIUS, Math.min(travel, MAX_TRAVEL) * PUSH_PER_PX);
+
     moved = true;
     wake();
   };
@@ -171,25 +214,15 @@ export function initDotGrid(canvas: HTMLCanvasElement): void {
   const onPointerOut = () => {
     pointerX = Number.NEGATIVE_INFINITY;
     pointerY = Number.NEGATIVE_INFINITY;
+    // Sem isto, voltar o mouse pela outra ponta da tela contaria como um gesto
+    // de mil pixels.
+    last = null;
     moved = true;
     wake();
   };
 
   const onPointerDown = (e: PointerEvent) => {
-    const cx = e.clientX - rect.left;
-    const cy = e.clientY - rect.top;
-    for (const dot of dots) {
-      const dx = dot.x - cx;
-      const dy = dot.y - cy;
-      const dist = Math.hypot(dx, dy);
-      if (dist > SHOCK_RADIUS) continue;
-      // Divisor evita explodir o ponto exatamente sob o clique (dist ~ 0).
-      const push = (SHOCK_STRENGTH * (1 - dist / SHOCK_RADIUS)) / Math.max(dist, 8);
-      dot.vx += dx * push;
-      dot.vy += dy * push;
-    }
-    moved = true;
-    wake();
+    push(e.clientX - rect.left, e.clientY - rect.top, SHOCK_RADIUS, SHOCK_STRENGTH);
   };
 
   const onVisibility = () => {

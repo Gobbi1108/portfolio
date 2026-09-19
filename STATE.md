@@ -136,7 +136,15 @@ Tudo isso está **implementado** desde 2026-09-18 — ver §0.
 
 ## 4. Bugs e pendências abertas
 
-Nenhum bug conhecido (comportamentos medidos em §0). Pendências reais:
+**Corrigido em 2026-09-19 (`fix/dot-grid-hover`):** o grid só reagia ao clique. O porte tinha
+trazido a cor por proximidade e a onda de choque do `pointerdown`, mas **não** o empurrão por
+movimento do ponteiro que o dot grid original faz por inércia — então passar o mouse só
+recolorina os pontos, sem mexer neles, e o único sinal de vida era clicar. Agora `push()` é
+uma função só, chamada pelos dois gatilhos (mover e clicar), variando apenas raio e força.
+Medido no navegador: deslocamento de pico **5.86px** no hover contra **10-12px** no clique, e
+o campo volta exatamente ao repouso nos dois casos.
+
+Outros bugs: nenhum conhecido (comportamentos medidos em §0). Pendências reais:
 
 - **Não existe `404.astro`** (é o M4). Hoje uma URL inválida cai no 404 do servidor. O host é
   Apache/Locaweb: `404.html` estático só é usado com `ErrorDocument` no `.htaccess`.
@@ -180,6 +188,9 @@ Modificados: `src/components/UnderConstruction.astro` (vira casca da galeria) e
 ---
 
 ## 7. Histórico de sessões (mais recente primeiro)
+
+- **2026-09-19** — `fix/dot-grid-hover`: o empurrão do ponteiro no dot grid, que o porte do
+  M2 tinha deixado de fora (§4). Um `push()` só para mover e clicar.
 
 - **2026-09-18** — M2 e M1 na branch `feat/home-hotspots`: dot grid, cursor de bola,
   5 hotspots, placeholder mobile, 5 rotas provisórias (3KB de JS na home, medido no
