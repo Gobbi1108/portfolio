@@ -31,6 +31,7 @@ Pelo teclado: `Tab` percorre os cinco (o primeiro `Tab` é o link "pular para co
 | `npm run typecheck` | `astro check` — gate de CI |
 | `npm run lint` | ESLint — gate de CI |
 | `npm run check:hotspots` | valida o mapa das 5 regiões da home |
+| `npm run check:gallery` | valida o enquadramento `cover` da galeria WebGL |
 
 Antes de commitar: `npm run typecheck && npm run lint && npm run build`.
 
