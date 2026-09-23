@@ -36,6 +36,15 @@
     <rect x="58" y="292" width="144" height="18" fill="var(--color-brutal-ink)"></rect>
   </g>
 
+  <clipPath id="phone-screen">
+    <rect x="42" y="34" width="176" height="352"></rect>
+  </clipPath>
+
+  {/* O splash sai por wipe, não por fade: duas camadas cheias em cross-fade
+      ficam lavadas no meio do caminho, e borda dura é o traço do site.
+      O clip fica no WRAPPER, não no grupo animado: clip-path aplicado no
+      próprio elemento viaja junto com o transform e não recorta nada. */}
+  <g clip-path="url(#phone-screen)">
   <g class="phone__splash">
     <rect x="42" y="34" width="176" height="352" fill="var(--color-brutal-blue)"></rect>
     <g class="phone__logo">
@@ -65,13 +74,14 @@
       stroke-width="5"
       stroke-dasharray="28 85"></circle>
   </g>
+  </g>
 </svg>
 
 <style>
-  /* Estado final: o app montado, o splash já saiu de cena. O splash vem
-     DEPOIS do app no DOM para cobri-lo enquanto existe. */
+  /* Estado final: o app montado, o splash já saiu de cena por cima. O splash
+     vem DEPOIS do app no DOM para cobri-lo enquanto existe. */
   .phone__splash {
-    opacity: 0;
+    transform: translateY(-100%);
   }
 
   .phone__app {
@@ -89,20 +99,21 @@
         transform-box: fill-box;
         transform-origin: center;
         animation: blade-assemble linear both;
-        animation-timeline: view();
-        animation-range: entry 15% cover 35%;
+        animation-timeline: --stack;
+        animation-range: cover 10% cover 35%;
         animation-delay: calc(var(--i) * -0.08s);
       }
 
       .phone__splash {
+        transform-box: fill-box;
         animation: splash-out linear both;
-        animation-timeline: view();
-        animation-range: cover 45% cover 60%;
+        animation-timeline: --stack;
+        animation-range: cover 45% cover 65%;
       }
 
-      /* O app NÃO anima: ele já está opaco embaixo do splash. Cross-fade de
-         duas camadas cheias deixa as duas lavadas durante a transição —
-         some com o splash e o app aparece limpo. */
+      /* O app NÃO anima: ele já está opaco embaixo do splash. Fade de
+         duas camadas cheias deixava as duas lavadas no meio do caminho —
+         o splash sobe e o app aparece limpo, com borda dura. */
 
       /* O spinner é tempo, não scroll: ele gira enquanto o splash existe. */
       .phone__spinner {
@@ -120,10 +131,11 @@
 
       @keyframes splash-out {
         from {
-          opacity: 1;
+          transform: translateY(0);
         }
+
         to {
-          opacity: 0;
+          transform: translateY(-100%);
         }
       }
 

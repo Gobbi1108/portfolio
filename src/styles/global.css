@@ -225,6 +225,15 @@
   overflow: clip;
 }
 
+/* Título de capítulo. `overflow-wrap` não é enfeite: palavra longa
+   ("RESPONSIVIDADE") em coluna estreita escapa do container e passa por baixo
+   da cena ao lado. */
+@utility chapter-title {
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
 /* Toda cena escala pelo viewBox e nunca estoura a coluna. */
 @utility scene-svg {
   display: block;

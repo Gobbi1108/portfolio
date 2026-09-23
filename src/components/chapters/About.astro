@@ -11,7 +11,7 @@ const { t } = Astro.props;
 
 <section class="chapter-block chapter" aria-labelledby="about-title">
   <div class="chapter__text">
-    <h2 id="about-title" class="font-display uppercase">{t.heading}</h2>
+    <h2 id="about-title" class="chapter-title font-display uppercase">{t.heading}</h2>
     <p>{t.body}</p>
   </div>
   <div class="chapter__scene"><PortraitScene /></div>
@@ -23,10 +23,6 @@ const { t } = Astro.props;
     gap: 2rem;
     padding: clamp(1.5rem, 5vw, 4rem);
     margin: clamp(1rem, 4vw, 3rem);
-  }
-
-  .chapter h2 {
-    font-size: clamp(2rem, 6vw, 4rem);
   }
 
   .chapter p {

@@ -32,7 +32,7 @@ export const ptBr = {
     ],
   },
   responsive: {
-    heading: "Responsividade",
+    heading: "Responsivo",
     body: "Uma interface que só funciona em um tamanho de tela não funciona. O bloco ao lado é o mesmo em qualquer largura — quem muda é o layout.",
     screens: ["Desktop", "Tablet", "Celular"],
   },
