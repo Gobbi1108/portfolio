@@ -27,7 +27,13 @@ assert.ok(
 );
 
 for (const { id, label, href } of HOTSPOTS) {
-  assert.match(href, /^\/[a-z0-9-]+$/, `href de "${id}" é rota absoluta em kebab-case`);
+  // Depois da mudança de rotas (spec §3) todo destino vive sob /void. Um href
+  // sem o prefixo vira 404 silencioso: o link existe, a página não.
+  assert.match(
+    href,
+    /^\/void\/[a-z0-9-]+$/,
+    `href de "${id}" é rota absoluta sob /void, em kebab-case`,
+  );
   assert.ok(label.trim().length > 2, `rótulo de "${id}" descreve o destino`);
 }
 

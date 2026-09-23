@@ -347,7 +347,9 @@
     letter-spacing: 0.12em;
   }
 
-  body > *:not(.mobile-gate) {
+  /* Só apaga o conteúdo quando a página de fato pediu o gate. Sem o :has,
+     esta regra escondia o site inteiro em qualquer tela pequena. */
+  body:has(> .mobile-gate) > *:not(.mobile-gate) {
     display: none;
   }
 }

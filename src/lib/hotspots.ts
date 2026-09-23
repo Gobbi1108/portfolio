@@ -1,4 +1,4 @@
-// Fonte única da verdade das 5 regiões clicáveis da home (ROADMAP.md §2).
+// Fonte única da verdade das 5 regiões clicáveis da home secreta em /void.
 //
 // Só dados. A geometria (quadrado de `min(10vw, 10vh)` colado em um canto ou
 // no centro) vive no CSS, em `.hotspot[data-anchor]` dentro de global.css —
@@ -33,24 +33,24 @@ export const HOTSPOT_ANCHORS: readonly HotspotAnchor[] = [
 ];
 
 export const HOTSPOTS: readonly Hotspot[] = [
-  { id: "jogos", label: "Jogos", href: "/jogos", anchor: "top-left" },
+  { id: "jogos", label: "Jogos", href: "/void/jogos", anchor: "top-left" },
   {
     id: "lab-a",
     label: "Laboratório A — ideia em construção",
-    href: "/lab-a",
+    href: "/void/lab-a",
     anchor: "top-right",
   },
-  { id: "portfolio", label: "Portfólio", href: "/portfolio", anchor: "center" },
+  { id: "portfolio", label: "Portfólio", href: "/void/portfolio", anchor: "center" },
   {
     id: "roadmap",
     label: "Roadmap pessoal",
-    href: "/roadmap",
+    href: "/void/roadmap",
     anchor: "bottom-left",
   },
   {
     id: "lab-b",
     label: "Laboratório B — ideia em construção",
-    href: "/lab-b",
+    href: "/void/lab-b",
     anchor: "bottom-right",
   },
 ];
