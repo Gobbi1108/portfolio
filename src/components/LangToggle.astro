@@ -1,0 +1,25 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import type { Locale } from "../i18n";
+
+interface Props {
+  current: Locale;
+  label: string;
+  otherName: string;
+}
+
+const { current, label, otherName } = Astro.props;
+const other: Locale = current === "pt-br" ? "en" : "pt-br";
+const href = getRelativeLocaleUrl(other, "");
+const otherLang = other === "en" ? "en" : "pt-BR";
+---
+
+<a
+  class="brutal-link px-3 py-2 font-display text-sm uppercase"
+  href={href}
+  hreflang={otherLang}
+  lang={otherLang}
+  aria-label={`${label}: ${otherName}`}
+>
+  {otherName}
+</a>
