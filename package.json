@@ -11,6 +11,7 @@
     "preview": "astro preview",
     "typecheck": "astro check",
     "check:hotspots": "node --experimental-strip-types src/lib/hotspots.check.ts",
+    "check:konami": "node --experimental-strip-types src/lib/konami.check.ts",
     "lint": "eslint . --ext .ts,.tsx,.astro",
     "lint:fix": "eslint . --ext .ts,.tsx,.astro --fix"
   },
