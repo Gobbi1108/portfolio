@@ -1,0 +1,94 @@
+---
+import type { Dict } from "../../i18n";
+import FlutterPhoneScene from "../scenes/FlutterPhoneScene.astro";
+
+interface Props {
+  t: Dict["stack"];
+}
+
+const { t } = Astro.props;
+---
+
+<section class="stack" aria-labelledby="stack-title">
+  <div class="stack__stage sticky-stage">
+    <div class="stack__grid">
+      <div>
+        <h2 id="stack-title" class="font-display uppercase">{t.heading}</h2>
+        <ul class="stack__list">
+          {
+            t.items.map((item) => (
+              <li class="stack__item">
+                <span class="font-display uppercase">{item.name}</span>
+                <span class="stack__note">{item.note}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <FlutterPhoneScene />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Pai alto = a linha do tempo. O filho sticky fica preso uma viewport
+     enquanto esses 120vh extras rolam. */
+  .stack {
+    min-height: 220vh;
+  }
+
+  .stack__grid {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    width: min(72rem, 92vw);
+  }
+
+  .stack__list {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .stack__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.75rem;
+    border-bottom: var(--border-brutal-width) solid var(--color-brutal-black);
+    padding-block: 0.4rem;
+  }
+
+  .stack__note {
+    font-size: 0.875rem;
+    opacity: 0.75;
+  }
+
+  .stack h2 {
+    font-size: clamp(2rem, 6vw, 4rem);
+  }
+
+  .stack :global(.phone) {
+    max-width: 15rem;
+  }
+
+  @media (min-width: 48rem) {
+    .stack__grid {
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+  }
+
+  /* No celular o palco preso rouba a rolagem sem entregar nada: a cena fica
+     pequena demais ao lado do texto. Vira seção normal. */
+  @media (max-width: 47.99rem) {
+    .stack {
+      min-height: auto;
+    }
+
+    .stack__stage {
+      position: static;
+      height: auto;
+      padding-block: 3rem;
+    }
+  }
+</style>
