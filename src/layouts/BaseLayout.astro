@@ -21,6 +21,8 @@ interface Props {
   noindex?: boolean;
   /** Versões em outro idioma desta mesma página. */
   alternate?: { hreflang: string; href: string }[];
+  /** Texto do skip-link. Vem do dicionário nas rotas bilíngues. */
+  skipLabel?: string;
 }
 
 const {
@@ -32,6 +34,9 @@ const {
   mobileGate = false,
   noindex = false,
   alternate = [],
+  // Default em PT porque as rotas sem dicionário (/void, /styleguide) são
+  // todas em português. As bilíngues passam t.ui.skipToContent.
+  skipLabel = "Pular para conteúdo",
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -83,7 +88,7 @@ const ogImage = new URL(image, Astro.site).toString();
       href="#main"
       class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:btn-brutal"
     >
-      Pular para conteúdo
+      {skipLabel}
     </a>
 
     {

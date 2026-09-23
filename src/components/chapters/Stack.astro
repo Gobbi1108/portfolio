@@ -34,10 +34,27 @@ const { t } = Astro.props;
   /* Pai alto = a linha do tempo. O filho sticky fica preso uma viewport
      enquanto esses 120vh extras rolam. */
   /* Timeline na seção alta, não na cena: dentro do sticky-stage a cena não se
-     move na viewport e um `view()` nela congela (ver Responsive.astro). */
+     move na viewport e um `view()` nela congela (ver Responsive.astro).
+     A altura extra fica sob a MESMA guarda do palco: sem animação ela vira
+     scroll morto. */
   .stack {
-    min-height: 220vh;
     view-timeline: --stack block;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      @media (min-width: 48rem) {
+        .stack {
+          min-height: 220vh;
+        }
+      }
+    }
+  }
+
+  /* Sem palco preso (celular, reduced-motion, sem suporte) a seção precisa do
+     seu próprio respiro vertical. */
+  .stack__stage {
+    padding-block: 3rem;
   }
 
   .stack__grid {
@@ -77,17 +94,4 @@ const { t } = Astro.props;
     }
   }
 
-  /* No celular o palco preso rouba a rolagem sem entregar nada: a cena fica
-     pequena demais ao lado do texto. Vira seção normal. */
-  @media (max-width: 47.99rem) {
-    .stack {
-      min-height: auto;
-    }
-
-    .stack__stage {
-      position: static;
-      height: auto;
-      padding-block: 3rem;
-    }
-  }
 </style>

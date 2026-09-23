@@ -217,12 +217,22 @@
    rola, e a própria rolagem do pai é a linha do tempo da animação.
    Aplicar sticky-stage no FILHO e view-timeline no PAI alto. */
 @utility sticky-stage {
-  position: sticky;
-  top: 0;
-  height: 100dvh;
   display: grid;
   place-items: center;
   overflow: clip;
+
+  /* Prender só onde a animação existe. Palco preso sem animação é scroll
+     morto: o visitante rola viewports inteiras de pixels parados. A seção
+     alta que alimenta a timeline segue a mesma guarda. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      @media (min-width: 48rem) {
+        position: sticky;
+        top: 0;
+        height: 100dvh;
+      }
+    }
+  }
 }
 
 /* Título de capítulo. `overflow-wrap` não é enfeite: palavra longa

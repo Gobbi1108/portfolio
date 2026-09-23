@@ -31,8 +31,17 @@ const { t } = Astro.props;
      A timeline é nomeada e mora aqui, na seção alta: dentro do sticky-stage a
      trilha não se move na viewport e um `view()` nela congelaria. */
   .exp {
-    min-height: 320vh;
     view-timeline: --exp block;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      @media (min-width: 48rem) and (max-width: 108rem) {
+        .exp {
+          min-height: 320vh;
+        }
+      }
+    }
   }
 
   .exp__stage {
@@ -57,8 +66,11 @@ const { t } = Astro.props;
     width: 100%;
   }
 
+  /* 32rem, não 26rem: com cards menores a fila mede ~1328px e CABE inteira
+     num monitor de 1440, então não havia distância para deslizar e a seção
+     prendia 320vh para mover 3px. A 32rem a fila mede ~1616px. */
   .exp__card {
-    flex: 0 0 min(26rem, 80vw);
+    flex: 0 0 min(32rem, 80vw);
     padding: clamp(1.25rem, 3vw, 2rem);
   }
 
@@ -88,7 +100,12 @@ const { t } = Astro.props;
       @media (min-width: 48rem) {
         .exp__track {
           /* A trilha passa a ser dirigida pela rolagem: nada de barra
-             horizontal própria enquanto a animação manda nela. */
+             horizontal própria enquanto a animação manda nela.
+             `max-content` não é enfeite: sem ele a trilha assume a largura da
+             coluna, `-100%` no keyframe resolve contra essa largura em vez da
+             fila de cards, e os dois termos se anulam — medido, o deslocamento
+             no fim do range era 0px a 1440 e -25px a 1920. */
+          width: max-content;
           overflow-x: visible;
           animation: exp-slide linear both;
           animation-timeline: --exp;
@@ -96,29 +113,34 @@ const { t } = Astro.props;
         }
 
         /* -100% + 92vw deixa o último card parando dentro da tela, em vez de
-           sair por completo. */
+           sair por completo. O `min()` trava em 0 quando a fila já cabe na
+           tela: sem ele a trilha andaria para a direita. */
         @keyframes exp-slide {
           to {
-            transform: translateX(calc(-100% + 92vw));
+            transform: translateX(min(0px, calc(-100% + 92vw)));
           }
         }
       }
     }
   }
 
-  /* No celular a timeline é vertical: palco preso em tela pequena prende o
-     polegar sem entregar história (spec §9). */
-  @media (max-width: 47.99rem) {
-    .exp {
-      min-height: auto;
-    }
+  /* Sem palco preso a seção precisa do seu próprio respiro vertical. */
+  .exp__stage {
+    padding-block: 3rem;
+  }
 
+  /* Acima de ~1744px a fila de cards cabe na tela: prender o palco para
+     deslizar nada seria scroll morto. Vira fila estática. */
+  @media (min-width: 108.01rem) {
     .exp__stage {
       position: static;
       height: auto;
-      padding-block: 3rem;
     }
+  }
 
+  /* No celular a timeline é vertical: trilha horizontal em tela estreita
+     esconde dois dos três cargos atrás de um gesto que ninguém descobre. */
+  @media (max-width: 47.99rem) {
     .exp__track {
       flex-direction: column;
       overflow-x: visible;

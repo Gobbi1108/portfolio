@@ -57,6 +57,9 @@ const links = [
   addEventListener("scroll", armAtEnd, { passive: true });
   // Página curta demais para rolar já está, por definição, 100% vista.
   armAtEnd();
+  // E de novo no load: recarregar a página já no rodapé restaura a posição
+  // sem emitir `scroll`, e sem isto o segredo nunca armaria nesse caso.
+  addEventListener("load", armAtEnd);
 
   addEventListener("keydown", (event) => {
     state = press(state, event.key);

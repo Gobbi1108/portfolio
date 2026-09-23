@@ -28,10 +28,10 @@ Não peça permissão pra ler esses arquivos. Leia.
 | Camada | Escolha | Nota |
 |---|---|---|
 | Framework | **Astro 6**, saída estática | rotas em `src/pages/` |
-| UI interativa | **React 19** em ilhas `.tsx` | só onde precisa de estado/RAF/WebGL |
+| UI interativa | **nenhuma** — Astro puro + `<script>` de módulo | React saiu em 2026-09-22 por falta de consumidor |
 | Estilo | **Tailwind v4 CSS-first** | `@theme` / `@utility` em `src/styles/global.css` |
-| Animação | **GSAP 3.15** (ScrollTrigger, Observer, InertiaPlugin) | todos os plugins são free nesta versão |
-| 3D / Lottie | **removidos** junto com a v1 | nada no roadmap precisa; se voltar, volta com plano |
+| Animação | **CSS scroll-driven** (`animation-timeline`) | contrato obrigatório na §6.1 |
+| 3D / Lottie / GSAP / React | **removidos** | nada no roadmap precisa; se voltar, volta com plano |
 | Tipos | **TypeScript 6 strict** (`astro/tsconfigs/strict`) | `any` é erro de lint |
 | Node | **>= 22.12** | CI usa 22 |
 
@@ -64,15 +64,15 @@ arquivo pequeno chamado por `node` —, não com framework de teste novo.
 
 ## 3. Arquitetura — regras duras
 
-- **Astro renderiza, React interage.** Página nova é `.astro`. Ilha React só quando precisa
-  de pointer/RAF/WebGL/state.
-- Ilhas usam `client:visible` ou `client:idle`. **Nunca `client:load`** (mata o LCP).
-  Exceção única: cursor/hotspots globais, que precisam existir cedo — `client:idle`, e
-  aceite cursor nativo por um instante como fallback.
-- **Uma ilha, uma responsabilidade.** Cursor não conhece rota; hotspot não desenha grid;
-  grid não sabe o que é botão.
-- Plugin GSAP se registra **só** em `src/lib/gsap.ts`. Importe daí, nunca de `gsap/*`.
-- Todo listener, RAF, ScrollTrigger e contexto WebGL tem cleanup no `useEffect`. Sem exceção.
+- **Astro renderiza, CSS anima, JS é exceção.** Página nova é `.astro`. Hoje o site inteiro
+  roda com ~700 bytes de JS (o Konami); qualquer coisa que passe disso precisa de motivo.
+- **Sem framework de UI.** Se um dia uma ilha for inevitável, ela volta como decisão
+  explícita: `client:visible` ou `client:idle`, **nunca `client:load`** (mata o LCP).
+- **Um módulo, uma responsabilidade.** Cursor não conhece rota; hotspot não desenha grid;
+  grid não sabe o que é botão; capítulo não conhece outro capítulo.
+- Animação é CSS (§6.1). Se um dia uma cena provar que CSS não resolve, GSAP volta como dep
+  nova, com `src/lib/gsap.ts` como único ponto de `registerPlugin` e import dinâmico.
+- Todo listener, RAF e contexto WebGL tem cleanup. Sem exceção.
 - Sem estado global (store/context provider) até existirem 2+ consumidores reais.
 
 ---
@@ -86,16 +86,14 @@ View Transitions, WebGL cru)? → 4. Dep instalada resolve? → 5. Cabe em ~20 l
 
 **Ausentes de propósito. Não instale sem aprovação explícita:**
 
-- `framer-motion` / `motion` → **GSAP já faz**. Componente de terceiro que importa
-  `framer-motion` é portado pra GSAP na integração.
+- `framer-motion` / `motion` → **CSS scroll-driven já faz** (§6.1), e sem runtime de React.
 - `lucide-react` → SVG inline. Um ícone não vale um pacote.
-- `animejs` → só se GSAP falhar em algo concreto. Se entrar, é v4 ESM
-  (`import { animate, createTimeline, createScope } from 'animejs'`), com `createScope({ root })`
-  + `scope.revert()` no cleanup, e **sem** duplicar a mesma animação nas duas libs.
+- `gsap` / `animejs` → só se uma cena **concreta** provar que CSS não resolve. Nesse caso
+  entra com import dinâmico e cleanup, nunca no bundle inicial.
 - `shadcn/ui` e component libs → não temos e não precisamos. `clsx`/`tailwind-merge` saíram
   junto com a v1; se a composição de classes voltar a doer, um `cn()` de 3 linhas resolve.
-- `react` e `gsap` **continuam instalados sem consumidor** — reservados para o M3 (galeria) e
-  o M4 (tela de erro) do `ROADMAP.md`. Não importam nada hoje, logo não pesam no bundle.
+- `react`, `react-dom`, `@astrojs/react` e `gsap` **foram desinstalados em 2026-09-22** por
+  não terem consumidor. `dist/_astro` não tem nenhum `.js`. Reinstalar é decisão, não detalhe.
 
 Componente copiado de fora (ReactBits, 21st.dev) entra em `src/components/ui/` **reescrito
 pra esta stack**: zero deps novas, zero `any`, cleanup completo, cores vindas do `@theme`.
@@ -117,7 +115,7 @@ Asset externo (vídeo/imagem em CDN de terceiro) é copiado pro projeto — não
 - Cor/sombra/medida nova vira token nomeado antes de virar valor arbitrário. Arbitrário
   (`bg-[#007A33]`) só com comentário justificando.
 - `!important` proibido (salvo override comentado).
-- Classe condicional via `cn()`.
+- Classe condicional: `cn()` de 3 linhas se voltar a doer; hoje não existe e não faz falta.
 
 **Astro**
 - Imagem de conteúdo usa `<Image />` de `astro:assets`. `public/` é só pra asset servido cru.
@@ -192,8 +190,8 @@ Interface construída sobre elemento invisível é armadilha de a11y. Portanto:
 ## 8. Performance (em portfólio, performance É produto)
 
 - LCP < 2.5s · CLS < 0.1 · INP < 200ms · JS inicial < 100KB gzip.
-- WebGL/3D/Lottie/galeria são lazy e têm fallback DOM quando o contexto falha.
-- Import fragmentado: `import { gsap } from '../lib/gsap'`; nunca `import * as THREE`.
+- Import fragmentado e nomeado; nunca `import * as X`. Sem bundle de runtime de framework.
+- Import fragmentado e nomeado; nunca `import * as X`. Sem runtime de framework no bundle.
 - `devicePixelRatio` clampado em 2. RAF pausa em `document.hidden`.
 - Imagem em WebP/AVIF; fonte com `font-display: swap` + preload da principal.
 
@@ -240,13 +238,15 @@ são o resto do ciclo.
 
 ```
 src/
-  pages/            # rotas (.astro) — 1 arquivo = 1 rota
+  pages/            # rotas (.astro) — 1 arquivo = 1 rota; /void é o easter egg
   layouts/          # BaseLayout e afins
-  components/       # .astro estático
-    ui/             # componentes React portados de fora (.tsx)
-  lib/              # gsap.ts, cn.ts, helpers
+  components/
+    chapters/       # um capítulo do portfólio por arquivo
+    scenes/         # cenas animadas, autocontidas (SVG/HTML + @keyframes)
+  i18n/             # pt-br.ts (fonte), en.ts (tipado contra ela), index.ts
+  lib/              # dotGrid, cursorOrb, hotspots, konami + seus *.check.ts
   styles/global.css # @theme + @utility — única fonte de estilo
-  assets/           # imagens, lottie, modelos (processados pelo Astro)
+  assets/           # imagens processadas pelo Astro
   types/            # tipos exportados
 public/             # servido cru (favicon, og, robots)
 ```
