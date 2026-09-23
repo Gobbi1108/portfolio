@@ -1,0 +1,50 @@
+---
+import type { Dict } from "../../i18n";
+import PortraitScene from "../scenes/PortraitScene.astro";
+
+interface Props {
+  t: Dict["about"];
+}
+
+const { t } = Astro.props;
+---
+
+<section class="chapter-block chapter" aria-labelledby="about-title">
+  <div class="chapter__text">
+    <h2 id="about-title" class="font-display uppercase">{t.heading}</h2>
+    <p>{t.body}</p>
+  </div>
+  <div class="chapter__scene"><PortraitScene /></div>
+</section>
+
+<style>
+  .chapter {
+    display: grid;
+    gap: 2rem;
+    padding: clamp(1.5rem, 5vw, 4rem);
+    margin: clamp(1rem, 4vw, 3rem);
+  }
+
+  .chapter h2 {
+    font-size: clamp(2rem, 6vw, 4rem);
+  }
+
+  .chapter p {
+    max-width: 52ch;
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    line-height: 1.6;
+    margin-top: 1rem;
+  }
+
+  .chapter__scene :global(.portrait) {
+    max-width: 20rem;
+  }
+
+  /* Coluna única no celular; duas colunas a partir de 768px (spec §9). */
+  @media (min-width: 48rem) {
+    .chapter {
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+    }
+  }
+</style>
