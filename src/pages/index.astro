@@ -5,6 +5,7 @@ import Hero from "../components/chapters/Hero.astro";
 import About from "../components/chapters/About.astro";
 import Stack from "../components/chapters/Stack.astro";
 import Responsive from "../components/chapters/Responsive.astro";
+import Experience from "../components/chapters/Experience.astro";
 import { DICT, HTML_LANG, type Locale } from "../i18n";
 
 const locale: Locale = "pt-br";
@@ -31,6 +32,7 @@ const t = DICT[locale];
   <About t={t.about} />
   <Stack t={t.stack} />
   <Responsive t={t.responsive} />
+  <Experience t={t.experience} />
 </BaseLayout>
 
 <style>

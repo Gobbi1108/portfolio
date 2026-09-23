@@ -1,0 +1,131 @@
+---
+import type { Dict } from "../../i18n";
+
+interface Props {
+  t: Dict["experience"];
+}
+
+const { t } = Astro.props;
+---
+
+<section class="exp" aria-labelledby="exp-title">
+  <div class="exp__stage sticky-stage">
+    <h2 id="exp-title" class="exp__title chapter-title font-display uppercase">{t.heading}</h2>
+    <ol class="exp__track">
+      {
+        t.jobs.map((job) => (
+          <li class="exp__card chapter-block">
+            <p class="exp__period font-display uppercase">{job.period}</p>
+            <h3 class="exp__company font-display uppercase">{job.company}</h3>
+            <p class="exp__role">{job.role}</p>
+            <p class="exp__note">{job.note}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  /* Altura do pai = quanto de rolagem vertical vira deslocamento horizontal.
+     A timeline é nomeada e mora aqui, na seção alta: dentro do sticky-stage a
+     trilha não se move na viewport e um `view()` nela congelaria. */
+  .exp {
+    min-height: 320vh;
+    view-timeline: --exp block;
+  }
+
+  .exp__stage {
+    grid-template-rows: auto 1fr;
+    align-content: center;
+    gap: 2rem;
+    padding-inline: clamp(1rem, 4vw, 4rem);
+    justify-items: start;
+  }
+
+  /* Estado final: a trilha parada no começo, com os 3 cards em fila. Sem
+     animação o visitante rola a lista com o próprio dedo ou a roda
+     (overflow-x: auto), então nada fica inacessível. */
+  .exp__track {
+    display: flex;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-x: auto;
+    transform: none;
+    width: 100%;
+  }
+
+  .exp__card {
+    flex: 0 0 min(26rem, 80vw);
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .exp__period {
+    font-size: 0.8rem;
+    color: var(--color-brutal-magenta);
+    letter-spacing: 0.1em;
+  }
+
+  .exp__company {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    margin-top: 0.5rem;
+  }
+
+  .exp__role {
+    font-weight: 700;
+    margin-top: 0.25rem;
+  }
+
+  .exp__note {
+    margin-top: 0.75rem;
+    line-height: 1.6;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      @media (min-width: 48rem) {
+        .exp__track {
+          /* A trilha passa a ser dirigida pela rolagem: nada de barra
+             horizontal própria enquanto a animação manda nela. */
+          overflow-x: visible;
+          animation: exp-slide linear both;
+          animation-timeline: --exp;
+          animation-range: cover 25% cover 75%;
+        }
+
+        /* -100% + 92vw deixa o último card parando dentro da tela, em vez de
+           sair por completo. */
+        @keyframes exp-slide {
+          to {
+            transform: translateX(calc(-100% + 92vw));
+          }
+        }
+      }
+    }
+  }
+
+  /* No celular a timeline é vertical: palco preso em tela pequena prende o
+     polegar sem entregar história (spec §9). */
+  @media (max-width: 47.99rem) {
+    .exp {
+      min-height: auto;
+    }
+
+    .exp__stage {
+      position: static;
+      height: auto;
+      padding-block: 3rem;
+    }
+
+    .exp__track {
+      flex-direction: column;
+      overflow-x: visible;
+    }
+
+    .exp__card {
+      flex: 1 1 auto;
+    }
+  }
+</style>
