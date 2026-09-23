@@ -67,7 +67,7 @@ export const ptBr = {
         body: "Código bom sozinho é rascunho. A parte que vale é destravar o outro.",
       },
       {
-        title: "Troubleshooting",
+        title: "Causa raiz",
         body: "Sintoma não é causa. Vou até a raiz antes de propor conserto.",
       },
       {

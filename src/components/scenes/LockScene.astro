@@ -1,0 +1,62 @@
+---
+// Cadeado da pós em Cybersegurança: a haste desce e fecha.
+---
+
+<svg
+  class="scene-svg lock"
+  viewBox="0 0 200 200"
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+>
+  <clipPath id="lock-body-top">
+    <rect x="0" y="0" width="200" height="96"></rect>
+  </clipPath>
+
+  {/* Clip no wrapper, não na haste: clip-path no elemento animado viaja com o
+      transform e deixaria a haste escapar por cima da cena. */}
+  <g clip-path="url(#lock-body-top)">
+    <path
+      class="lock__shackle"
+      d="M70 96 L70 64 A30 30 0 0 1 130 64 L130 96"
+      fill="none"
+      stroke="var(--color-brutal-black)"
+      stroke-width="12"></path>
+  </g>
+
+  <rect
+    x="52"
+    y="96"
+    width="96"
+    height="76"
+    fill="var(--color-brutal-magenta)"
+    stroke="var(--color-brutal-black)"
+    stroke-width="5"></rect>
+  <circle cx="100" cy="128" r="10" fill="var(--color-brutal-paper)"></circle>
+  <rect x="95" y="132" width="10" height="22" fill="var(--color-brutal-paper)"></rect>
+</svg>
+
+<style>
+  /* Estado final: cadeado fechado. */
+  .lock__shackle {
+    transform: none;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .lock__shackle {
+        transform-box: fill-box;
+        transform-origin: center bottom;
+        animation: shackle-close linear both;
+        animation-timeline: view();
+        animation-range: entry 25% cover 55%;
+      }
+
+      @keyframes shackle-close {
+        from {
+          transform: translateY(-1.5rem) rotate(-12deg);
+        }
+      }
+    }
+  }
+</style>

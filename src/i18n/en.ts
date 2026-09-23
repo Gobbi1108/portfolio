@@ -67,7 +67,7 @@ export const en: typeof ptBr = {
         body: "Good code written alone is a draft. The part that counts is unblocking someone else.",
       },
       {
-        title: "Troubleshooting",
+        title: "Root cause",
         body: "A symptom is not a cause. I go to the root before proposing a fix.",
       },
       {
