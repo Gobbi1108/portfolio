@@ -52,5 +52,3 @@ coverage/
 # Lock de sessão do Claude Code — local, não versionar
 .claude/scheduled_tasks.lock
 
-# Página de medição temporária da execução do portfólio v2 (sai na Task 11).
-src/pages/probe-tmp.astro

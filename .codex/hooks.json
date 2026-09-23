@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node 'd:\\portifolio\\portfolio\\.codex\\hooks\\block-main-commit.mjs'",
+            "timeout": 10,
+            "statusMessage": "Checando branch antes de commitar..."
+          }
+        ]
+      }
+    ]
+  }
+}

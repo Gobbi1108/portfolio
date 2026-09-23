@@ -1,5 +1,10 @@
 ---
 import "../styles/global.css";
+// Preload das duas fontes que compõem a primeira tela. Sem isto o <h1> do
+// hero reflui quando a fonte chega e o CLS medido vai a 0.247 (teto: 0.1).
+// O `?url` faz o Vite devolver o caminho já com hash do build.
+import archivoBlack from "@fontsource/archivo-black/files/archivo-black-latin-400-normal.woff2?url";
+import inter from "@fontsource/inter/files/inter-latin-400-normal.woff2?url";
 
 interface Props {
   title?: string;
@@ -52,6 +57,8 @@ const ogImage = new URL(image, Astro.site).toString();
         />
       ))
     }
+    <link rel="preload" as="font" type="font/woff2" href={archivoBlack} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={inter} crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

@@ -1,4 +1,7 @@
-# CLAUDE.md — Regras do Jogo
+> **Espelho gerado.** A fonte é `CLAUDE.md` — edite lá e regenere este arquivo, nunca o
+> contrário. Regenerar: substituir `CLAUDE.md` por `AGENTS.md` no texto do original.
+
+# AGENTS.md — Regras do Jogo
 
 Prompt de sistema persistente deste repositório. **Estático e enxuto.** Nada de histórico,
 status ou bug aqui — isso vive em `STATE.md` (agora) e `ROADMAP.md` (futuro).
@@ -9,7 +12,7 @@ status ou bug aqui — isso vive em `STATE.md` (agora) e `ROADMAP.md` (futuro).
 
 Antes de **qualquer tarefa grande** (feature nova, refactor, pivô, PR):
 
-1. Ler `CLAUDE.md` — como codar e testar aqui.
+1. Ler `AGENTS.md` — como codar e testar aqui.
 2. Ler `STATE.md` — onde o código está travado agora.
 3. Ler `ROADMAP.md` — o que não pode ser quebrado no futuro.
 4. Ao terminar: **atualizar `STATE.md`** (sempre) e `ROADMAP.md` (se um marco mudou).
