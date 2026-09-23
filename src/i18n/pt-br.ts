@@ -13,7 +13,7 @@ export const ptBr = {
     name: "Gabriel Gobbi",
     role: "Desenvolvedor Frontend",
     focus: "Flutter & Web",
-    scrollHint: "role",
+    scrollHint: "rolar",
   },
   about: {
     heading: "Quem sou",

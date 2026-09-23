@@ -1,21 +1,40 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import LangToggle from "../../components/LangToggle.astro";
+import Hero from "../../components/chapters/Hero.astro";
 import { DICT, HTML_LANG, type Locale } from "../../i18n";
 
 const locale: Locale = "en";
 const t = DICT[locale];
 ---
 
+{/* bare: o header/footer e o gutter max-w-6xl do BaseLayout são da v1 e
+    brigam com capítulo full-bleed. O toggle de idioma vem no lugar deles. */}
 <BaseLayout
   title={`${t.hero.name} — ${t.hero.role}`}
   description={t.about.body}
   lang={HTML_LANG[locale]}
+  bare
   alternate={[
     { hreflang: "pt-BR", href: "/" },
     { hreflang: "en", href: "/en/" },
   ]}
 >
-  <LangToggle current={locale} label={t.ui.langLabel} otherName={t.ui.otherLangName} />
-  <h1 class="font-display uppercase">{t.hero.name}</h1>
+  <nav class="lang-nav" aria-label={t.ui.langLabel}>
+    <LangToggle current={locale} label={t.ui.langLabel} otherName={t.ui.otherLangName} />
+  </nav>
+
+  <Hero t={t.hero} />
 </BaseLayout>
+
+<style>
+  .lang-nav {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 30;
+    background-color: var(--color-brutal-paper);
+    border: var(--border-brutal-width) solid var(--color-brutal-black);
+    box-shadow: var(--shadow-brutal-sm);
+  }
+</style>

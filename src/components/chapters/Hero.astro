@@ -1,0 +1,142 @@
+---
+import type { Dict } from "../../i18n";
+
+interface Props {
+  t: Dict["hero"];
+}
+
+const { t } = Astro.props;
+// Um span por letra para escalonar a queda, agrupados por palavra: sem o
+// agrupamento a linha quebra ENTRE LETRAS ("GABRIE / L GOBBI"), porque cada
+// inline-block é uma oportunidade de quebra. O índice segue contínuo entre as
+// palavras para o atraso não reiniciar. O nome inteiro fica em sr-only: o
+// leitor de tela lê "Gabriel Gobbi", não as letras soltas.
+let letterIndex = 0;
+const words = t.name.split(" ").map((word) => ({
+  letters: [...word].map((char) => ({ char, i: letterIndex++ })),
+}));
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <h1 id="hero-title" class="hero__name font-display uppercase">
+    <span class="sr-only">{t.name}</span>
+    <span aria-hidden="true">
+      {
+        words.map((word) => (
+          <span class="hero__word">
+            {word.letters.map(({ char, i }) => (
+              <span class="hero__letter" style={`--i:${i}`}>
+                {char}
+              </span>
+            ))}
+          </span>
+        ))
+      }
+    </span>
+  </h1>
+
+  <p class="hero__role font-display uppercase">{t.role}</p>
+  <p class="hero__focus">{t.focus}</p>
+
+  <span class="hero__sweep" aria-hidden="true"></span>
+  <p class="hero__hint" aria-hidden="true">{t.scrollHint} ↓</p>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+    padding-inline: clamp(1rem, 4vw, 4rem);
+    overflow: clip;
+  }
+
+  .hero__name {
+    /* 14vw, não 18vw: a palavra mais longa tem 7 caracteres e a 18vw ela
+       estoura os 390px de um celular e some no overflow: clip. */
+    font-size: clamp(2rem, 14vw, 16rem);
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+  }
+
+  /* Palavra é a unidade de quebra. Sem isto a linha parte entre letras. */
+  .hero__word {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  /* Margem à direita, não à esquerda: margem esquerda na segunda palavra
+     indenta a linha quando o nome quebra. */
+  .hero__word:not(:last-child) {
+    margin-right: 0.25em;
+  }
+
+  /* Estado final: letra no lugar. O contrato de cena manda que seja assim. */
+  .hero__letter {
+    display: inline-block;
+    transform: none;
+    opacity: 1;
+  }
+
+  .hero__role {
+    font-size: clamp(1.25rem, 4vw, 2.5rem);
+  }
+
+  .hero__focus {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--color-brutal-magenta);
+  }
+
+  .hero__sweep {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 12%;
+    height: 1.25rem;
+    background-color: var(--color-brutal-yellow);
+    border-block: var(--border-brutal-width) solid var(--color-brutal-black);
+    transform: none;
+  }
+
+  .hero__hint {
+    position: absolute;
+    bottom: 2rem;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.75rem;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .hero__letter {
+        animation: letter-drop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+        /* Escalonamento por índice: a primeira letra cai primeiro. Não é
+           scroll-driven — o hero está na tela desde o carregamento. */
+        animation-delay: calc(var(--i) * 60ms);
+      }
+
+      .hero__sweep {
+        animation: sweep-in linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 40%;
+      }
+
+      @keyframes letter-drop {
+        from {
+          transform: translateY(-0.4em) rotate(-4deg);
+          opacity: 0;
+        }
+      }
+
+      @keyframes sweep-in {
+        from {
+          transform: scaleX(0);
+          transform-origin: left;
+        }
+      }
+    }
+  }
+</style>
