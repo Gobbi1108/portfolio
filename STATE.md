@@ -3,9 +3,10 @@
 Memória de curto/médio prazo do agente. **Arquivo mutável:** atualizar ao fim de toda tarefa
 grande. Se algo aqui contradiz o código, o código ganha — e esta linha vira correção.
 
-- **Data da última atualização:** 2026-09-22
-- **Branch:** `feat/portfolio-v2` → PR para a `main`
-- **Fase:** **M3 e M4 entregues.** M5/M6/M7 abertos (`ROADMAP.md` §5).
+- **Data da última atualização:** 2026-09-24
+- **Branch:** `main` — `feat/portfolio-v2` e `feat/404-e-limpeza` mergeadas.
+- **Fase:** **M3, M4 e M5 entregues.** M6/M7 abertos (`ROADMAP.md` §5) e os dois dependem de
+  conteúdo do Gabriel, não de código.
 - **Rotina de git enforçada por hook** (`.claude/hooks/block-main-commit.mjs` e o espelho em
   `.codex/hooks/`): `git commit` com a `main` em HEAD é recusado. Ciclo em `CLAUDE.md` §9.
 
@@ -121,28 +122,33 @@ A home finalmente pontua performance: antes o Lighthouse reportava `performance 
 
 ## 2. Bugs e pendências abertas
 
-- **Não existe `404.astro`** (é o M5). O host é Apache/Locaweb: `404.html` estático só é
-  usado com `ErrorDocument` no `.htaccess`.
-- **LinkedIn ausente.** A chave existe e vazia significa "não renderiza o link". Preencher
-  nos dois dicionários.
 - **Inglês não revisado por humano.** Traduzido pelo agente a partir do PT.
-- **Toggle de idioma sobrepõe conteúdo no celular.** É `position: fixed`; legível (chip com
-  fundo e borda), mas passa por cima de texto ao rolar. Cosmético, não corrigido.
-- **`.lh/` guarda relatórios da v1**, que não descrevem mais este site.
 - **Sem check runnable para a máquina de estado do cursor** do `/void`.
+- **Site ainda não subiu.** O build de 2026-09-24 está em `dist/`; o deploy é FTP manual
+  (Locaweb) e ninguém fez. `public/.htaccess` precisa chegar à raiz do site junto.
 
 ---
 
 ## 3. Atacar em seguida (ordem)
 
-1. **M5** — `404.astro` + `.htaccess` com `ErrorDocument /404.html`.
+1. **Deploy** — subir `dist/` por FTP, `.htaccess` incluído, e conferir uma rota inválida
+   no domínio real (é o único lugar onde o `ErrorDocument` pode ser testado).
 2. **M6** — capítulo de cases, quando existir projeto documentado para mostrar.
 3. **M7** — conteúdo real das 5 rotas do `/void`.
-4. Revisar o inglês e preencher o LinkedIn (não bloqueia nada).
+4. Revisar o inglês (não bloqueia nada).
 
 ---
 
 ## 4. Histórico de sessões (mais recente primeiro)
+
+- **2026-09-24** — `feat/portfolio-v2` mergeada na `main` (13 commits, `--no-ff`). Depois,
+  `feat/404-e-limpeza`: **M5** (`src/pages/404.astro` + `public/.htaccess` com
+  `ErrorDocument /404.html`; o build emite `dist/404.html` na raiz e o Astro copia o
+  dotfile) e o toggle de idioma, que virou `@utility lang-nav` — `absolute` até 640px,
+  `fixed` acima. Verificado a 390px pelo truque do iframe: `docW=390`, zero overflow no
+  404, `navPos=absolute`, e o chip **sai da tela** ao rolar. O 404 é bilíngue numa página
+  só porque o Apache serve um `ErrorDocument` para `/` e `/en/`. `.lh/` (6.3MB de
+  relatórios da v1) apagado — era `.gitignore`, nunca esteve no repo.
 
 - **2026-09-22** — `feat/portfolio-v2`: portfólio bilíngue de 7 capítulos com cenas em CSS
   scroll-driven, `/void` como easter egg atrás do Konami armado no fim da rota, React e GSAP

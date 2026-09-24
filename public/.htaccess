@@ -1,0 +1,4 @@
+# Locaweb/Apache: o build estático gera dist/404.html, mas o Apache só o usa
+# se alguém apontar. Sem esta linha, rota inválida cai na página de erro
+# genérica do servidor.
+ErrorDocument 404 /404.html

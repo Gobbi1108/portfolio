@@ -189,6 +189,24 @@
   padding: 1.5rem;
 }
 
+/* Chip de troca de idioma das rotas bilíngues, canto superior direito.
+   `absolute` por padrão, `fixed` só a partir de 640px: preso na viewport ele
+   passa por cima do texto dos capítulos ao rolar num celular, onde não existe
+   gutter ao lado da coluna. Acima disso sobra margem e ele pode acompanhar. */
+@utility lang-nav {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 30;
+  background-color: var(--color-brutal-paper);
+  border: var(--border-brutal-width) solid var(--color-brutal-black);
+  box-shadow: var(--shadow-brutal-sm);
+
+  @media (width >= 40rem) {
+    position: fixed;
+  }
+}
+
 /* ===================================================================
    CONTRATO DE CENA (spec §5) — leia antes de animar qualquer coisa.
 

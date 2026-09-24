@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Rota única para os dois idiomas: o Apache serve um só ErrorDocument
+// (public/.htaccess) para /qualquer-coisa e /en/qualquer-coisa, então a tela
+// fala nas duas línguas em vez de adivinhar a do visitante.
+//
+// ponytail: sem cena animada. O plano antigo (ROADMAP §5.2) era portar o
+// `prisma-hero` com vídeo de fundo e GSAP — as duas coisas saíram do projeto.
+// Se um dia a tela de erro merecer cena, ela entra como capítulo com o
+// contrato de cena da §6.1, não com dep nova.
+---
+
+<BaseLayout
+  title="404 — Gabriel Gobbi"
+  description="Esta página não existe. This page does not exist."
+  bare
+  noindex
+>
+  <section
+    class="relative grid min-h-[100dvh] place-items-center overflow-clip px-6 text-center"
+  >
+    <div class="max-w-2xl">
+      <p
+        class="font-display text-[clamp(5rem,28vw,18rem)] uppercase leading-[0.8] tracking-tight"
+      >
+        404
+      </p>
+
+      <p class="mt-6 font-display text-[clamp(1.25rem,4vw,2rem)] uppercase">
+        Página não encontrada
+      </p>
+      <p lang="en" class="mt-1 font-display text-[clamp(1rem,3vw,1.5rem)] uppercase text-brutal-magenta">
+        Page not found
+      </p>
+
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <a href="/" class="btn-brutal btn-brutal-hover">Início</a>
+        <a href="/en/" lang="en" class="btn-brutal btn-brutal-hover">Home</a>
+      </div>
+    </div>
+
+    <span
+      class="pointer-events-none absolute inset-x-0 bottom-[12%] h-5 border-y-2 border-brutal-black bg-brutal-yellow"
+      aria-hidden="true"></span>
+  </section>
+</BaseLayout>
