@@ -3,7 +3,7 @@
 Planejamento de longo prazo: marcos, escopo e decisões que o código de **hoje** já tem que
 respeitar. Estado do agora fica em `STATE.md`. Regras de codificação em `CLAUDE.md`.
 
-Última revisão: **2026-09-22**.
+Última revisão: **2026-09-24**.
 
 ---
 
@@ -49,8 +49,6 @@ ponto é reflow real), `aria-hidden`, cores por token, zero requisição de rede
 
 ## 3. Conteúdo ainda ausente (decisão do Gabriel)
 
-- **URL do LinkedIn.** A chave existe no dicionário; string vazia = o link não é renderizado.
-  Preencher em `src/i18n/pt-br.ts` **e** `en.ts`.
 - **Capítulo de cases/projetos.** Não existe porque não há projeto documentado. É o M6 —
   criar cards vazios seria mentira de layout.
 - **Revisão do inglês.** Traduzido pelo agente a partir do PT; o Gabriel revisa quando quiser.
@@ -98,7 +96,7 @@ As cinco caem na tela "in construction" estática. Conteúdo real é o M7.
 | **M2** | Home dot-grid | grid + cursor + 5 hotspots + nav acessível | ✅ 2026-09-18 |
 | **M3** | Portfólio v2 bilíngue | 7 capítulos, i18n, responsivo, cenas em CSS | ✅ 2026-09-22 |
 | **M4** | Easter egg | `/void` + Konami armado no fim da rota | ✅ 2026-09-22 |
-| **M5** | Tela de erro | `error-hero` portada, `404.astro`, `.htaccess` com `ErrorDocument` | aberto |
+| **M5** | Tela de erro | `404.astro` bilíngue + `.htaccess` com `ErrorDocument` | ✅ 2026-09-24 |
 | **M6** | Cases reais | capítulo de projetos, com projeto de verdade documentado | aberto |
 | **M7** | Conteúdo do `/void` | as 5 rotas deixam de ser "in construction" | aberto |
 
