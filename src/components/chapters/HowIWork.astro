@@ -1,0 +1,83 @@
+---
+import type { Dict } from "../../i18n";
+import TeamScene from "../scenes/TeamScene.astro";
+import GearScene from "../scenes/GearScene.astro";
+import LockScene from "../scenes/LockScene.astro";
+
+interface Props {
+  t: Dict["howIWork"];
+}
+
+const { t } = Astro.props;
+// A ordem aqui casa com a ordem de t.traits no dicionário. Trait novo entra
+// nesta lista na mesma posição.
+const scenes = [TeamScene, GearScene, LockScene];
+---
+
+<section class="how" aria-labelledby="how-title">
+  <h2 id="how-title" class="chapter-title font-display uppercase">{t.heading}</h2>
+  <ul class="how__grid">
+    {
+      t.traits.map((trait, i) => {
+        const Scene = scenes[i];
+        return (
+          <li class="how__card chapter-block">
+            {Scene && <Scene />}
+            <h3 class="font-display uppercase">{trait.title}</h3>
+            <p>{trait.body}</p>
+          </li>
+        );
+      })
+    }
+  </ul>
+</section>
+
+<style>
+  .how {
+    padding: clamp(1.5rem, 5vw, 4rem);
+    margin: clamp(1rem, 4vw, 3rem);
+  }
+
+  .how h2 {
+    margin-bottom: 2rem;
+  }
+
+  .how__grid {
+    display: grid;
+    gap: 2rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .how__grid > * {
+    min-width: 0;
+  }
+
+  .how__card {
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  /* Escala e quebra: "TROUBLESHOOTING" a 1.5rem fixo estoura o card e invade
+     o vizinho. */
+  .how__card h3 {
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    overflow-wrap: break-word;
+    margin-top: 1rem;
+  }
+
+  .how__card p {
+    margin-top: 0.5rem;
+    line-height: 1.6;
+  }
+
+  .how__card :global(.scene-svg) {
+    max-width: 11rem;
+  }
+
+  @media (min-width: 48rem) {
+    .how__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

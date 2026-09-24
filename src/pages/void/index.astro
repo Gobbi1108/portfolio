@@ -1,0 +1,45 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { HOTSPOTS } from "../../lib/hotspots";
+---
+
+<BaseLayout
+  title="Gabriel Gobbi"
+  description="Portfólio de Gabriel Gobbi — cinco seções escondidas em um campo de pontos. Explore."
+  bare
+  mobileGate
+  noindex
+>
+  <div class="home-stage">
+    <canvas class="dot-grid-canvas" data-dot-grid aria-hidden="true"></canvas>
+
+    <h1 class="sr-only">Gabriel Gobbi — portfólio</h1>
+
+    {/* Os hotspots são os links reais do site. O rótulo dentro de cada um é o
+        nome acessível (e aparece no foco de teclado), então não existe um
+        segundo menu duplicando as mesmas rotas. */}
+    <nav aria-label="Seções do site">
+      {
+        HOTSPOTS.map((hotspot) => (
+          <a
+            class="hotspot"
+            href={hotspot.href}
+            data-hotspot
+            data-anchor={hotspot.anchor}
+          >
+            <span class="hotspot-label">{hotspot.label}</span>
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="cursor-orb" data-cursor-orb data-visible="false" aria-hidden="true">
+      <span class="cursor-orb-fill"></span>
+    </div>
+  </div>
+
+  <script>
+    import "../../lib/dotGrid";
+    import "../../lib/cursorOrb";
+  </script>
+</BaseLayout>

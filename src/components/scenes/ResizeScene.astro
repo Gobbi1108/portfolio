@@ -1,0 +1,115 @@
+---
+interface Props {
+  /** Rótulos dos 3 tamanhos, vindos do dicionário. */
+  labels: readonly string[];
+}
+
+const { labels } = Astro.props;
+// Cena em HTML, não SVG, de propósito: SVG não reflui. O ponto aqui é o
+// conteúdo interno mudando de layout quando a moldura encolhe.
+---
+
+<div class="resize" aria-hidden="true">
+  <div class="resize__frame">
+    <div class="resize__bar">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="resize__content">
+      {Array.from({ length: 6 }, () => <div class="resize__card" />)}
+    </div>
+  </div>
+  <p class="resize__labels">{labels.join(" · ")}</p>
+</div>
+
+<style>
+  .resize {
+    width: 100%;
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+  }
+
+  /* Estado final: a moldura no tamanho de celular, com o conteúdo em 1
+     coluna. Sem animação, é isso que se vê — e continua fazendo sentido ao
+     lado do texto. */
+  .resize__frame {
+    width: 18rem;
+    max-width: 100%;
+    border: var(--border-brutal-width) solid var(--color-brutal-black);
+    box-shadow: var(--shadow-brutal-md);
+    background-color: var(--color-brutal-paper);
+  }
+
+  .resize__bar {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.5rem;
+    border-bottom: var(--border-brutal-width) solid var(--color-brutal-black);
+    background-color: var(--color-brutal-yellow);
+  }
+
+  .resize__bar span {
+    width: 0.6rem;
+    height: 0.6rem;
+    border: 2px solid var(--color-brutal-black);
+    border-radius: 999px;
+  }
+
+  /* O reflow de verdade: as colunas caem de 3 para 1 conforme a largura da
+     moldura muda. Nenhuma media query, nenhum JS — é o mesmo mecanismo que
+     sustenta o site inteiro. */
+  .resize__content {
+    display: grid;
+    /* 9rem, não 5rem: com card mínimo pequeno demais a moldura de 38rem já
+       cabe 6 colunas e a queda 3→2→1 nunca acontece. Medido: 3 colunas a
+       38rem, 2 a 26rem, 1 a 18rem. */
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .resize__card {
+    height: 3rem;
+    border: 2px solid var(--color-brutal-black);
+    background-color: var(--color-brutal-bone);
+  }
+
+  .resize__card:nth-child(3n) {
+    background-color: var(--color-brutal-orange);
+  }
+
+  .resize__labels {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.75rem;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .resize__frame {
+        animation: frame-shrink linear both;
+        /* Timeline nomeada, declarada pela seção alta que contém o palco
+           (ver comentário em Responsive.astro). */
+        animation-timeline: --responsive;
+        animation-range: cover 25% cover 70%;
+      }
+
+      /* Largura animada, não transform: scale achataria os cards junto. Aqui
+         o layout recalcula de verdade a cada frame — é o ponto da cena. */
+      @keyframes frame-shrink {
+        0% {
+          width: 38rem;
+        }
+
+        55% {
+          width: 26rem;
+        }
+
+        100% {
+          width: 18rem;
+        }
+      }
+    }
+  }
+</style>

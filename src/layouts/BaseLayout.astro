@@ -1,5 +1,10 @@
 ---
 import "../styles/global.css";
+// Preload das duas fontes que compõem a primeira tela. Sem isto o <h1> do
+// hero reflui quando a fonte chega e o CLS medido vai a 0.247 (teto: 0.1).
+// O `?url` faz o Vite devolver o caminho já com hash do build.
+import archivoBlack from "@fontsource/archivo-black/files/archivo-black-latin-400-normal.woff2?url";
+import inter from "@fontsource/inter/files/inter-latin-400-normal.woff2?url";
 
 interface Props {
   title?: string;
@@ -7,6 +12,17 @@ interface Props {
   image?: string;
   /** Sem header, footer nem gutter: a página ocupa a viewport inteira (home). */
   bare?: boolean;
+  /** Locale da página. Vira o atributo lang do <html> e o og:locale. */
+  lang?: "pt-BR" | "en";
+  /** Substitui a página inteira por "MOBILE" em tela pequena. Só as rotas de
+      /void usam: o portfólio é responsivo de verdade (spec §9). */
+  mobileGate?: boolean;
+  /** Tira a rota do índice de busca. O easter egg não é conteúdo público. */
+  noindex?: boolean;
+  /** Versões em outro idioma desta mesma página. */
+  alternate?: { hreflang: string; href: string }[];
+  /** Texto do skip-link. Vem do dicionário nas rotas bilíngues. */
+  skipLabel?: string;
 }
 
 const {
@@ -14,6 +30,13 @@ const {
   description = "Portfolio neubrutalista de Gabriel Gobbi — desenvolvedor e designer. Interfaces com tipografia forte, cores chapadas e sombras hard.",
   image = "/og.png",
   bare = false,
+  lang = "pt-BR",
+  mobileGate = false,
+  noindex = false,
+  alternate = [],
+  // Default em PT porque as rotas sem dicionário (/void, /styleguide) são
+  // todas em português. As bilíngues passam t.ui.skipToContent.
+  skipLabel = "Pular para conteúdo",
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -21,7 +44,7 @@ const ogImage = new URL(image, Astro.site).toString();
 ---
 
 <!doctype html>
-<html lang="pt-BR">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -29,12 +52,24 @@ const ogImage = new URL(image, Astro.site).toString();
     <meta name="theme-color" content="#faf7f0" />
     <meta name="color-scheme" content="light" />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    {
+      alternate.map((alt) => (
+        <link
+          rel="alternate"
+          hreflang={alt.hreflang}
+          href={new URL(alt.href, Astro.site).toString()}
+        />
+      ))
+    }
+    <link rel="preload" as="font" type="font/woff2" href={archivoBlack} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={inter} crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Gabriel Gobbi" />
-    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:locale" content={lang === "en" ? "en_US" : "pt_BR"} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -53,16 +88,16 @@ const ogImage = new URL(image, Astro.site).toString();
       href="#main"
       class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:btn-brutal"
     >
-      Pular para conteúdo
+      {skipLabel}
     </a>
 
-    {/* Placeholder mobile temporário (ROADMAP §4): CSS puro esconde o resto do
-        body e mostra só isto em telas pequenas. Sai no M5, junto do modelo
-        mobile de verdade.
-        ponytail: gate por media query esconde o conteúdo do crawler mobile —
-        aceitável enquanto o site não é divulgado; se precisar indexar antes do
-        M5, trocar por rota /mobile com redirect. */}
-    <div class="mobile-gate">MOBILE</div>
+    {
+      /* Placeholder temporário das rotas do easter egg (spec §9): elas dependem
+         de hover e não têm modelo mobile. O portfólio NÃO usa este gate.
+         ponytail: enquanto durar, o crawler mobile não vê /void — que é
+         justamente noindex, então o custo é zero. */
+      mobileGate && <div class="mobile-gate">MOBILE</div>
+    }
 
     {!bare && (
     <header

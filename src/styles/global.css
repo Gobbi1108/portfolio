@@ -24,6 +24,11 @@
      mantém papel de cor de foco/destaque. */
   --color-brutal-blue: #1d4ed8;
   --color-brutal-lime: #b6ff3a;
+  /* Accent quente do sistema. Medido: 3.50:1 contra paper (#faf7f0) — abaixo
+     de 4.5:1, então NÃO é cor de texto. Vale para fundo chapado, borda e SVG
+     decorativo; texto sobre ele usa preto (5.29:1, passa AA). Mesmo
+     tratamento dado ao --color-brutal-pink. */
+  --color-brutal-orange: #e5541b;
 
   /* Home nova (ROADMAP §3): campo de pontos sobre fundo quase preto.
      `--color-grid-active` é a cor pedida para o ponto sob o ponteiro e também
@@ -182,6 +187,70 @@
   border: var(--border-brutal-width) solid var(--color-brutal-black);
   box-shadow: var(--shadow-brutal-md);
   padding: 1.5rem;
+}
+
+/* ===================================================================
+   CONTRATO DE CENA (spec §5) — leia antes de animar qualquer coisa.
+
+   O CSS base de um elemento de cena é o ESTADO FINAL legível. A animação
+   mora SÓ dentro da dupla guarda abaixo:
+
+     @supports (animation-timeline: view()) {
+       @media (prefers-reduced-motion: no-preference) { ... }
+     }
+
+   Assim o navegador sem scroll-driven animations, o usuário com
+   reduced-motion, o crawler e a impressão veem a cena montada.
+   Escrever o estado INICIAL no CSS base quebra os quatro de uma vez.
+   =================================================================== */
+
+/* Tijolo do capítulo: borda dura e sombra deslocada. É o que dá o ritmo
+   neobrutalista — todo capítulo é uma laje empilhada, não um card flutuando
+   em gutter. */
+@utility chapter-block {
+  border: var(--border-brutal-width) solid var(--color-brutal-black);
+  box-shadow: var(--shadow-brutal-lg);
+  background-color: var(--color-brutal-paper);
+}
+
+/* Palco de cena presa: o filho gruda por uma viewport enquanto o pai alto
+   rola, e a própria rolagem do pai é a linha do tempo da animação.
+   Aplicar sticky-stage no FILHO e view-timeline no PAI alto. */
+@utility sticky-stage {
+  display: grid;
+  place-items: center;
+  overflow: clip;
+
+  /* Prender só onde a animação existe. Palco preso sem animação é scroll
+     morto: o visitante rola viewports inteiras de pixels parados. A seção
+     alta que alimenta a timeline segue a mesma guarda. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      @media (min-width: 48rem) {
+        position: sticky;
+        top: 0;
+        height: 100dvh;
+      }
+    }
+  }
+}
+
+/* Título de capítulo. `overflow-wrap` não é enfeite: palavra longa
+   ("RESPONSIVIDADE") em coluna estreita escapa do container e passa por baixo
+   da cena ao lado. */
+@utility chapter-title {
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Toda cena escala pelo viewBox e nunca estoura a coluna. */
+@utility scene-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 44rem;
+  margin-inline: auto;
 }
 
 /* ===================================================================
@@ -347,7 +416,9 @@
     letter-spacing: 0.12em;
   }
 
-  body > *:not(.mobile-gate) {
+  /* Só apaga o conteúdo quando a página de fato pediu o gate. Sem o :has,
+     esta regra escondia o site inteiro em qualquer tela pequena. */
+  body:has(> .mobile-gate) > *:not(.mobile-gate) {
     display: none;
   }
 }

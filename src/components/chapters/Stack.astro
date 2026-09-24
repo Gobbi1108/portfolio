@@ -1,0 +1,97 @@
+---
+import type { Dict } from "../../i18n";
+import FlutterPhoneScene from "../scenes/FlutterPhoneScene.astro";
+
+interface Props {
+  t: Dict["stack"];
+}
+
+const { t } = Astro.props;
+---
+
+<section class="stack" aria-labelledby="stack-title">
+  <div class="stack__stage sticky-stage">
+    <div class="stack__grid">
+      <div>
+        <h2 id="stack-title" class="chapter-title font-display uppercase">{t.heading}</h2>
+        <ul class="stack__list">
+          {
+            t.items.map((item) => (
+              <li class="stack__item">
+                <span class="font-display uppercase">{item.name}</span>
+                <span class="stack__note">{item.note}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <FlutterPhoneScene />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Pai alto = a linha do tempo. O filho sticky fica preso uma viewport
+     enquanto esses 120vh extras rolam. */
+  /* Timeline na seção alta, não na cena: dentro do sticky-stage a cena não se
+     move na viewport e um `view()` nela congela (ver Responsive.astro).
+     A altura extra fica sob a MESMA guarda do palco: sem animação ela vira
+     scroll morto. */
+  .stack {
+    view-timeline: --stack block;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      @media (min-width: 48rem) {
+        .stack {
+          min-height: 220vh;
+        }
+      }
+    }
+  }
+
+  /* Sem palco preso (celular, reduced-motion, sem suporte) a seção precisa do
+     seu próprio respiro vertical. */
+  .stack__stage {
+    padding-block: 3rem;
+  }
+
+  .stack__grid {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    width: min(72rem, 92vw);
+  }
+
+  .stack__list {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .stack__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.75rem;
+    border-bottom: var(--border-brutal-width) solid var(--color-brutal-black);
+    padding-block: 0.4rem;
+  }
+
+  .stack__note {
+    font-size: 0.875rem;
+    opacity: 0.75;
+  }
+
+  .stack :global(.phone) {
+    max-width: 15rem;
+  }
+
+  @media (min-width: 48rem) {
+    .stack__grid {
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+  }
+
+</style>

@@ -1,0 +1,73 @@
+---
+import type { Dict } from "../../i18n";
+import ResizeScene from "../scenes/ResizeScene.astro";
+
+interface Props {
+  t: Dict["responsive"];
+}
+
+const { t } = Astro.props;
+---
+
+<section class="responsive" aria-labelledby="responsive-title">
+  <div class="responsive__stage sticky-stage">
+    <div class="responsive__grid">
+      <div>
+        <h2 id="responsive-title" class="chapter-title font-display uppercase">{t.heading}</h2>
+        <p>{t.body}</p>
+      </div>
+      <ResizeScene labels={t.screens} />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* A linha do tempo mora AQUI, na seção alta, e não na cena: a cena está
+     dentro de um sticky-stage e, presa, ela não se move na viewport — um
+     `animation-timeline: view()` na própria cena congela no primeiro valor.
+     A seção rola de verdade, então é ela quem marca o tempo. */
+  .responsive {
+    view-timeline: --responsive block;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      @media (min-width: 48rem) {
+        .responsive {
+          min-height: 200vh;
+        }
+      }
+    }
+  }
+
+  /* Sem palco preso a seção precisa do seu próprio respiro vertical. */
+  .responsive__stage {
+    padding-block: 3rem;
+  }
+
+  /* min-width: 0 nos itens: sem isso o min-width auto do grid deixa a moldura
+     larga da cena empurrar a coluna e estourar o container (grid blowout). */
+  .responsive__grid > * {
+    min-width: 0;
+  }
+
+  .responsive__grid {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    width: min(72rem, 92vw);
+  }
+
+  .responsive p {
+    max-width: 48ch;
+    line-height: 1.6;
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 48rem) {
+    .responsive__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+</style>

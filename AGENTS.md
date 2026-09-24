@@ -1,4 +1,7 @@
-# CLAUDE.md — Regras do Jogo
+> **Espelho gerado.** A fonte é `CLAUDE.md` — edite lá e regenere este arquivo, nunca o
+> contrário. Regenerar: substituir `CLAUDE.md` por `AGENTS.md` no texto do original.
+
+# AGENTS.md — Regras do Jogo
 
 Prompt de sistema persistente deste repositório. **Estático e enxuto.** Nada de histórico,
 status ou bug aqui — isso vive em `STATE.md` (agora) e `ROADMAP.md` (futuro).
@@ -9,7 +12,7 @@ status ou bug aqui — isso vive em `STATE.md` (agora) e `ROADMAP.md` (futuro).
 
 Antes de **qualquer tarefa grande** (feature nova, refactor, pivô, PR):
 
-1. Ler `CLAUDE.md` — como codar e testar aqui.
+1. Ler `AGENTS.md` — como codar e testar aqui.
 2. Ler `STATE.md` — onde o código está travado agora.
 3. Ler `ROADMAP.md` — o que não pode ser quebrado no futuro.
 4. Ao terminar: **atualizar `STATE.md`** (sempre) e `ROADMAP.md` (se um marco mudou).
@@ -187,6 +190,7 @@ Interface construída sobre elemento invisível é armadilha de a11y. Portanto:
 ## 8. Performance (em portfólio, performance É produto)
 
 - LCP < 2.5s · CLS < 0.1 · INP < 200ms · JS inicial < 100KB gzip.
+- Import fragmentado e nomeado; nunca `import * as X`. Sem bundle de runtime de framework.
 - Import fragmentado e nomeado; nunca `import * as X`. Sem runtime de framework no bundle.
 - `devicePixelRatio` clampado em 2. RAF pausa em `document.hidden`.
 - Imagem em WebP/AVIF; fonte com `font-display: swap` + preload da principal.

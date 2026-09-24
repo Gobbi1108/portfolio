@@ -1,0 +1,122 @@
+---
+// Dois bonecos: o da esquerda gira o braço até a mão do outro; o bloco sobe
+// junto. É o "trabalho em equipe" do currículo, mostrado em vez de afirmado.
+---
+
+<svg
+  class="scene-svg team"
+  viewBox="0 0 320 200"
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+>
+  <rect x="0" y="176" width="320" height="6" fill="var(--color-brutal-black)"></rect>
+
+  <g>
+    <circle
+      cx="70"
+      cy="66"
+      r="20"
+      fill="var(--color-brutal-yellow)"
+      stroke="var(--color-brutal-black)"
+      stroke-width="4"></circle>
+    <rect
+      x="52"
+      y="92"
+      width="36"
+      height="66"
+      fill="var(--color-brutal-blue)"
+      stroke="var(--color-brutal-black)"
+      stroke-width="4"></rect>
+    <line
+      class="team__arm"
+      x1="88"
+      y1="104"
+      x2="132"
+      y2="104"
+      stroke="var(--color-brutal-black)"
+      stroke-width="7"
+      stroke-linecap="round"></line>
+  </g>
+
+  <g>
+    <circle
+      cx="250"
+      cy="66"
+      r="20"
+      fill="var(--color-brutal-orange)"
+      stroke="var(--color-brutal-black)"
+      stroke-width="4"></circle>
+    <rect
+      x="232"
+      y="92"
+      width="36"
+      height="66"
+      fill="var(--color-brutal-bone)"
+      stroke="var(--color-brutal-black)"
+      stroke-width="4"></rect>
+    <line
+      x1="232"
+      y1="104"
+      x2="188"
+      y2="104"
+      stroke="var(--color-brutal-black)"
+      stroke-width="7"
+      stroke-linecap="round"></line>
+  </g>
+
+  <rect
+    class="team__block"
+    x="140"
+    y="84"
+    width="40"
+    height="40"
+    fill="var(--color-brutal-pink)"
+    stroke="var(--color-brutal-black)"
+    stroke-width="4"></rect>
+</svg>
+
+<style>
+  /* Estado final: braço erguido, bloco no alto, entregue. */
+  .team__arm {
+    transform: none;
+  }
+
+  .team__block {
+    transform: none;
+    opacity: 1;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .team__arm {
+        transform-box: fill-box;
+        transform-origin: left center;
+        animation: arm-reach linear both;
+        animation-timeline: view();
+        animation-range: entry 20% cover 55%;
+      }
+
+      .team__block {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: block-lift linear both;
+        animation-timeline: view();
+        animation-range: entry 25% cover 60%;
+      }
+
+      @keyframes arm-reach {
+        from {
+          transform: rotate(34deg);
+        }
+      }
+
+      @keyframes block-lift {
+        from {
+          transform: translateY(2.6rem);
+          opacity: 0;
+        }
+      }
+    }
+  }
+</style>

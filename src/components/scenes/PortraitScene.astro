@@ -1,0 +1,97 @@
+---
+// Retrato geométrico: 6 formas entram de direções diferentes e travam no
+// lugar. Estilo chapado, sem gradiente e sem traço fino — o mesmo vocabulário
+// do resto do site.
+---
+
+<svg
+  class="scene-svg portrait"
+  viewBox="0 0 320 320"
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+>
+  <rect
+    class="portrait__p"
+    style="--i:0"
+    x="60"
+    y="200"
+    width="200"
+    height="100"
+    fill="var(--color-brutal-blue)"
+    stroke="var(--color-brutal-black)"
+    stroke-width="4"></rect>
+  <circle
+    class="portrait__p"
+    style="--i:1"
+    cx="160"
+    cy="140"
+    r="70"
+    fill="var(--color-brutal-bone)"
+    stroke="var(--color-brutal-black)"
+    stroke-width="4"></circle>
+  <path
+    class="portrait__p"
+    style="--i:2"
+    d="M90 120 Q160 40 230 120 L230 92 Q160 30 90 92 Z"
+    fill="var(--color-brutal-black)"></path>
+  <rect
+    class="portrait__p"
+    style="--i:3"
+    x="108"
+    y="130"
+    width="44"
+    height="32"
+    fill="none"
+    stroke="var(--color-brutal-black)"
+    stroke-width="5"></rect>
+  <rect
+    class="portrait__p"
+    style="--i:4"
+    x="168"
+    y="130"
+    width="44"
+    height="32"
+    fill="none"
+    stroke="var(--color-brutal-black)"
+    stroke-width="5"></rect>
+  <rect
+    class="portrait__p"
+    style="--i:5"
+    x="140"
+    y="188"
+    width="40"
+    height="10"
+    fill="var(--color-brutal-orange)"
+    stroke="var(--color-brutal-black)"
+    stroke-width="3"></rect>
+</svg>
+
+<style>
+  /* Estado final (contrato de cena): tudo no lugar, tudo visível. */
+  .portrait__p {
+    transform: none;
+    opacity: 1;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .portrait__p {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: portrait-assemble linear both;
+        animation-timeline: view();
+        /* Cada forma cobre uma fatia diferente do range: o retrato se monta
+           conforme a seção sobe, não tudo de uma vez. */
+        animation-range: entry calc(10% + var(--i) * 8%) cover calc(40% + var(--i) * 6%);
+      }
+
+      @keyframes portrait-assemble {
+        from {
+          transform: translateY(2rem) scale(0.8);
+          opacity: 0;
+        }
+      }
+    }
+  }
+</style>

@@ -1,0 +1,118 @@
+---
+import type { Dict } from "../../i18n";
+
+interface Props {
+  t: Dict["contact"];
+}
+
+const { t } = Astro.props;
+
+const links = [
+  { label: t.emailLabel, href: `mailto:${t.email}`, text: t.email },
+  { label: t.githubLabel, href: t.github, text: "Gobbi1108" },
+  // String vazia = link não existe. Melhor ausência que link morto.
+  ...(t.linkedin ? [{ label: t.linkedinLabel, href: t.linkedin, text: "LinkedIn" }] : []),
+];
+---
+
+<section class="contact chapter-block" aria-labelledby="contact-title">
+  <h2 id="contact-title" class="chapter-title font-display uppercase">
+    {t.heading}<span class="contact__dot" data-secret-dot>.</span>
+  </h2>
+  <p class="contact__invite">{t.invite}</p>
+
+  <ul class="contact__links">
+    {
+      links.map((link) => (
+        <li>
+          <span class="contact__label font-display uppercase">{link.label}</span>
+          <a class="brutal-link" href={link.href}>
+            {link.text}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+</section>
+
+<script>
+  import { IDLE, arm, press, isUnlocked } from "../../lib/konami";
+
+  // O segredo só arma quando o visitante chega ao fim da rota (spec §8).
+  // Checagem de fim de scroll, não IntersectionObserver numa sentinela: diz
+  // literalmente "chegou a 100%" em vez de "um elemento perto do fim apareceu",
+  // dispensa o elemento extra, e o listener sai de cena assim que arma.
+  const dot = document.querySelector("[data-secret-dot]");
+  let state = IDLE;
+
+  function armAtEnd() {
+    const root = document.documentElement;
+    if (window.scrollY + window.innerHeight < root.scrollHeight - 2) return;
+    state = arm(state);
+    dot?.setAttribute("data-armed", "true");
+    removeEventListener("scroll", armAtEnd);
+  }
+
+  addEventListener("scroll", armAtEnd, { passive: true });
+  // Página curta demais para rolar já está, por definição, 100% vista.
+  armAtEnd();
+  // E de novo no load: recarregar a página já no rodapé restaura a posição
+  // sem emitir `scroll`, e sem isto o segredo nunca armaria nesse caso.
+  addEventListener("load", armAtEnd);
+
+  addEventListener("keydown", (event) => {
+    state = press(state, event.key);
+    if (isUnlocked(state)) location.href = "/void";
+  });
+</script>
+
+<style>
+  .contact {
+    padding: clamp(1.5rem, 5vw, 4rem);
+    margin: clamp(1rem, 4vw, 3rem);
+  }
+
+  /* O tell: o ponto muda para a cor do /void quando o segredo arma. Única
+     aparição de --color-grid-active fora do easter egg (spec §6). */
+  .contact__dot {
+    color: var(--color-brutal-magenta);
+    transition: color 400ms;
+  }
+
+  .contact__dot[data-armed="true"] {
+    color: var(--color-grid-active);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .contact__dot {
+      transition: none;
+    }
+  }
+
+  .contact__invite {
+    margin-top: 1rem;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .contact__links {
+    display: grid;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin-top: 2rem;
+  }
+
+  .contact__label {
+    display: block;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    opacity: 0.7;
+  }
+
+  @media (min-width: 48rem) {
+    .contact__links {
+      grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    }
+  }
+</style>

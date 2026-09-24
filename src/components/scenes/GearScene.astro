@@ -1,0 +1,70 @@
+---
+// Engrenagem de troubleshooting: 8 dentes gerados como retângulos girados em
+// volta do eixo. Forma chapada, mesmo vocabulário das outras cenas.
+const TEETH = Array.from({ length: 8 }, (_, i) => i * 45);
+---
+
+<svg
+  class="scene-svg gear"
+  viewBox="0 0 200 200"
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+>
+  <g class="gear__body">
+    {
+      TEETH.map((deg) => (
+        <rect
+          x="90"
+          y="16"
+          width="20"
+          height="26"
+          fill="var(--color-brutal-black)"
+          transform={`rotate(${deg} 100 100)`}
+        />
+      ))
+    }
+    <circle
+      cx="100"
+      cy="100"
+      r="62"
+      fill="var(--color-brutal-lime)"
+      stroke="var(--color-brutal-black)"
+      stroke-width="5"></circle>
+    <circle
+      cx="100"
+      cy="100"
+      r="22"
+      fill="var(--color-brutal-paper)"
+      stroke="var(--color-brutal-black)"
+      stroke-width="5"></circle>
+  </g>
+</svg>
+
+<style>
+  .gear__body {
+    transform: none;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .gear__body {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: gear-turn linear both;
+        animation-timeline: view();
+        animation-range: entry 0% exit 100%;
+      }
+
+      @keyframes gear-turn {
+        from {
+          transform: rotate(-90deg);
+        }
+
+        to {
+          transform: rotate(90deg);
+        }
+      }
+    }
+  }
+</style>
