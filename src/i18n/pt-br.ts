@@ -82,7 +82,7 @@ export const ptBr = {
     email: "gabgobs@gmail.com",
     github: "https://github.com/Gobbi1108",
     /** Vazio = link não renderiza (spec §13). Sem placeholder, sem link morto. */
-    linkedin: "",
+    linkedin: "https://www.linkedin.com/in/gabriel-gobbi-2459b423b/",
     emailLabel: "E-mail",
     githubLabel: "GitHub",
     linkedinLabel: "LinkedIn",

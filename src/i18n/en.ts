@@ -81,7 +81,7 @@ export const en: typeof ptBr = {
     invite: "Open to frontend roles. Say hi.",
     email: "gabgobs@gmail.com",
     github: "https://github.com/Gobbi1108",
-    linkedin: "",
+    linkedin: "https://www.linkedin.com/in/gabriel-gobbi-2459b423b/",
     emailLabel: "Email",
     githubLabel: "GitHub",
     linkedinLabel: "LinkedIn",
